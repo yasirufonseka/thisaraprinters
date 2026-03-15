@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <!--    link bootstrap and css file-->
+    <link rel="stylesheet" th:href="@{/css/bootstrap-5.3.7-dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/employee.css}">
+
+    <!-- link sweet alert  -->
+    <link rel="stylesheet" th:href="@{/sweetalert2/sweetalert2.min.css}">
+
+</head>
+
+<body>
+    <!-- employee form for thisara printers  -->
+    <!-- employee form -->
+    <div class="top-navbar w-100 d-flex justify-content-center py-3 mb-4 shadow-sm">
+        <div class="d-flex flex-row align-items-center justify-content-between w-75">
+            <h2 class="mb-0 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px"
+                    fill="#FFFFFF">
+                    <path
+                        d="M560-440h200v-80H560v80Zm0-120h200v-80H560v80ZM200-320h320v-22q0-45-44-71.5T360-440q-72 0-116 26.5T200-342v22Zm160-160q33 0 56.5-23.5T440-560q0-33-23.5-56.5T360-640q-33 0-56.5 23.5T280-560q0 33 23.5 56.5T360-480ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z" />
+                </svg>
+                <span class="ms-2">Employee Management</span>
+            </h2>
+
+            <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#employeeModal">Add
+                Employee</button>
+
+        </div>
+    </div>
+
+    <div class="container-fluid d-flex flex-column align-items-center p-0">
+
+
+        <!-- employee table -->
+        <div class="container main-card m-5 p-5 rounded-4 shadow-lg card">
+
+            <!-- Search Bar -->
+            <div class="d-flex flex-row align-items-center justify-content-between mb-4">
+                <div class="searchBar w-50">
+                    <span class="px-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                            fill="#7d7c7c">
+                            <path
+                                d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                        </svg>
+                    </span>
+                    <input type="text" class="searchInput" id="searchEmployee" placeholder="Search Employee"
+                        onkeyup="searchEmployees()">
+                </div>
+            </div>
+
+            <table class="employeeTable">
+                <thead class="">
+                    <tr>
+
+                        <th>Full Name</th>
+                        <th>Calling Name</th>
+                        <th>NIC</th>
+                        <th>Date of Birth</th>
+                        <th>Gender</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Address</th>
+                        <th>Position</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- show employee data  -->
+                    <tr>
+
+                        <td>test</td>
+                        <td>test</td>
+                        <td>200000000000</td>
+                        <td>2000-01-01</td>
+                        <td>Male</td>
+                        <td>[EMAIL_ADDRESS]</td>
+                        <td>0700000000</td>
+                        <td>123, Main Street, Colombo</td>
+                        <td>Manager</td>
+                        <td class="d-flex flex-row ">
+                            <button class="btn btn-teal px-3 py-2 ms-2">Edit </button>
+                            <button class="btn btn-red px-3 py-2 ms-2">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+
+
+    <!-- Employee modal  -->
+
+    <div class="modal fade " id="employeeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl empModal">
+            <div class="modal-content p-4 shadow-lg rounded-4">
+                <div class="modal-header  d-inline-flex justify-content-between align-items-center p-3">
+                    <h4 class="modal-title text-white">Add New Employee</h4>
+                    <button type="button" class="btn btn-close btn-close-white" data-bs-dismiss="modal"
+                        onclick="resetForm()" aria-label="Close"></button>
+                </div>
+                <form method="post" id="employeeFormData" onsubmit="employeeFormDataListener(event)">
+                    <div class="modal-body">
+                        <div class="d-flex flex-row flex-wrap">
+                            <div class="mb-3 w-50">
+                                <label for="employeeName" class="form-label">Full Name: <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control w-75 validetion" name="fullName"
+                                    id="employeeFullName" placeholder="Enter full name" onblur="setCallingName()">
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label for="employeeName" class="form-label">Calling Name</label>
+                                <input type="text" class="form-control w-75 validetion" name="callingName"
+                                    id="employeeName" placeholder="Enter calling name">
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label for="employeeNIC" class="form-label">NIC: <span
+                                        class="text-danger">*</span></label>
+                                <input type="text" class="form-control w-75 validetion" name="nic"
+                                    onkeyup="validateNIC()" id="employeeNIC" placeholder="Enter NIC">
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label for="employeeDOB" class="form-label ">Date of Birth</label>
+                                <input type="date" class="form-control w-75 validetion" name="dob" id="employeeDOB"
+                                    placeholder="Enter date of birth">
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3  w-50">
+                                <label for="employeeGender" class="form-label">Gender: <span
+                                        class="text-danger">*</span></label>
+                                <div class="d-flex flex-row gap-3">
+
+                                    <input type="radio" name="gender" class="form-check " id="radioMale"
+                                        value="Male">Male
+                                    <input type="radio" name="gender" class="form-check" id="radioFemale"
+                                        value="Female">Female
+                                </div>
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label for="employeeEmail" class="form-label">Email : <span
+                                        class="text-danger">*</span></label>
+                                <input type="email" class="form-control w-75 validetion" name="email"
+                                    onkeyup="validateEmail()" id="employeeEmail" placeholder="Enter email">
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label for="employeePhone" class="form-label">Phone Number: <span
+                                        class="text-danger">*</span></label>
+                                <input type="tel" class="form-control w-75 validetion" name="phoneNo"
+                                    onkeyup="validateMobileNo()" id="employeePhone" placeholder="Enter phone number">
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label for="address" class="form-label">Address: <span
+                                        class="text-danger">*</span></label>
+                                <textarea id="address" class="form-control w-75 validetion" name="address"
+                                    placeholder="Enter your address"></textarea>
+                                <p class="text-danger errorMessage"></p>
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label for="jobposition" class="form-label">Position(Job Role): <span
+                                        class="text-danger">*</span></label>
+                                <select class="form-control w-75" name="position" id="jobposition">
+                                    <option value="manager">Manager</option>
+                                    <option value="developer">Developer</option>
+                                    <option value="designer">Designer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3  d-flex flex-row justify-content-end align-items-center  gap-3">
+
+                            <button type="reset" class="btn btn-secondary ">clear</button>
+                            <button type="reset" class="btn  btn-danger " data-bs-dismiss="modal"
+                                onclick="resetForm()">Cancel</button>
+                            <button type="submit" id="submitButton" class="btn btn-teal action-btn"
+                                onclick="validateEmptyFormData()">Add Employee</button>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- jquery  -->
+    <script th:src="@{/js/jquery-4.0.0.min.js}"></script>
+    <!-- link js bootstrap and js file -->
+    <script th:src="@{/css/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js}"></script>
+
+    <script th:src="@{/js/employee.js}"></script>
+
+    <!-- link sweet alert -->
+    <script th:src="@{/sweetalert2/sweetalert2.min.js}"></script>
+</body>
+
+</html>

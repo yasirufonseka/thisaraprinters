@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <!-- link bootstrap -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap-5.3.7-dist/css/bootstrap.min.css}">
+    <!-- link css -->
+    <link rel="stylesheet" th:href="@{/css/order.css}">
+
+</head>
+
+
+
+<body>
+
+    <!-- order management header -->
+
+    <div class="top-navbar w-100 d-flex justify-content-center py-3 mb-4 shadow-sm">
+        <div class="d-flex flex-row align-items-center justify-content-between w-75">
+            <h2 class="mb-0 text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" height="35px" viewBox="0 -960 960 960" width="35px"
+                    fill="#FFFFFF">
+                    <path
+                        d="M560-440h200v-80H560v80Zm0-120h200v-80H560v80ZM200-320h320v-22q0-45-44-71.5T360-440q-72 0-116 26.5T200-342v22Zm160-160q33 0 56.5-23.5T440-560q0-33-23.5-56.5T360-640q-33 0-56.5 23.5T280-560q0 33 23.5 56.5T360-480ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z" />
+                </svg>
+                <span class="ms-2">Order Management</span>
+            </h2>
+
+            <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#generateQuotationModal">Generate
+                Quotation</button>
+
+        </div>
+    </div>
+
+    <div class="container-fluid">
+
+        <!-- tab area for quotation and order -->
+
+        <div class="tab-container">
+            <div class="tab-header">
+                <button class="tab-btn active" onclick="openTab(event, 'quotation')">Quotation</button>
+                <button class="tab-btn" onclick="openTab(event, 'order')">Order</button>
+            </div>
+
+            <div id="quotation" class="tab-content" style="display: block;">
+                <h3>Quotation</h3>
+                <!-- quotation table -->
+
+
+                <table class="tablestyle">
+                    <thead class="">
+                        <tr>
+                            <th>Quotation ID</th>
+                            <th>Customer Name</th>
+                            <th>Quotation Date</th>
+                            <th>Quotation Status</th>
+                            <th>Quotation Amount</th>
+                            <th>Quotation Validity</th>
+                            <th>Quotation Description</th>
+                            <th>Quotation Actions</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- show employee data  -->
+                        <tr>
+                            <td>E001</td>
+                            <td>test</td>
+                            <td>test</td>
+                            <td>200000000000</td>
+                            <td>2000-01-01</td>
+                            <td>Male</td>
+                            <td>[EMAIL_ADDRESS]</td>
+                            <td class="d-flex flex-row ">
+                                <button class="btn btn-warning px-3 py-2 ms-2 text-dark fw-bold"
+                                    title="Send to Production">Send to Production</button>
+                                <button class="btn btn-teal px-3 py-2 ms-2">Edit </button>
+                                <button class="btn btn-danger px-3 py-2 ms-2">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+
+            <div id="order" class="tab-content">
+                <h3>Data Table</h3>
+                <!-- quotation table -->
+
+
+                <table class="tablestyle">
+                    <thead class="">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Quotation Id</th>
+                            <th>Customer Name</th>
+                            <th>Job Status</th>
+                            <th>Priority</th>
+                            <th>Current Status</th>
+                            <th>Deliver Date</th>
+                            <th> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- show employee data  -->
+                        <tr>
+                            <td>O001</td>
+                            <td>Q002</td>
+                            <td>test</td>
+                            <td>Design</td>
+                            <td>
+                                <select class="form-select status-select" style="width: auto;">
+                                    <option value="Normal">Normal</option>
+                                    <option value="Urgent">Urgent</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </td>
+                            <td><span class="badge bg-info text-dark">Design</span></td>
+                            <td>2000-01-01</td>
+                            <td class="d-flex flex-row ">
+                                <button class="btn btn-teal px-3 py-2 ms-2">Edit </button>
+                                <button class="btn btn-danger px-3 py-2 ms-2">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- quotation modal -->
+
+
+    <div class="modal fade " id="generateQuotationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl empModal">
+            <div class="modal-content p-4 shadow-lg rounded-4">
+                <div class="modal-header  d-inline-flex justify-content-between align-items-center p-3">
+                    <h4 class="modal-title text-white">Generate Quotation</h4>
+                    <button type="button" class="btn btn-close " data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="row g-3">
+                        <!-- Customer Info -->
+                        <div class="col-md-6">
+                            <label for="quotationId" class="form-label">Quotation ID</label>
+                            <input type="text" class="form-control" id="quotationId" placeholder="Auto-generated"
+                                readonly>
+                        </div>
+                        <div class="col-md-6 position-relative">
+                            <label for="customerName" class="form-label">Customer Name</label>
+                            <div class="customerSearch">
+                                <input type="text" class="form-control w-75" id="customerName"
+                                    placeholder="Enter Customer Name">
+                                <button type="button" class="btn btn-teal ms-2 "
+                                    onclick="openClientSearch(event,'searchCustomerModal')"><svg
+                                        xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"
+                                        width="24px" fill="#e3e3e3">
+                                        <path
+                                            d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                                    </svg>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="col-12">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="3"
+                                placeholder="Enter Description"></textarea>
+                        </div>
+
+                        <!-- Product Specs -->
+                        <div class="col-md-4">
+                            <label for="productSize" class="form-label">Product Size</label>
+
+                            <select class="form-select" id="productSize">
+                                <option value="" selected>Select Size</option>
+                                <option value="A3">A3 (11.69" x 16.54")</option>
+                                <option value="A4">A4 (8.27" x 11.69")</option>
+                                <option value="A5">A5 (5.83" x 8.27")</option>
+                                <option value="Letter">Letter (8.5" x 11")</option>
+                                <option value="Legal">Legal (8.5" x 14")</option>
+                            </select>
+
+                        </div>
+                        <div class="col-md-4">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" placeholder="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="colorType" class="form-label">Color Type</label>
+                            <select class="form-select" id="colorType">
+                                <option value="4-colours">4 Colours</option>
+                                <option value="2-colours">2 Colours</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="materials" class="form-label">Materials</label>
+                            <input type="text" class="form-control" id="materials" placeholder="Enter materials">
+                        </div>
+
+                        <!-- Finishing Options -->
+                        <div class="col-md-4">
+                            <label class="form-label d-block fw-bold">Binding</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="binding" id="bindingPerfect"
+                                    value="perfect">
+                                <label class="form-check-label" for="bindingPerfect">Perfect</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="binding" id="bindingSpiral"
+                                    value="spiral">
+                                <label class="form-check-label" for="bindingSpiral">Spiral</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label d-block fw-bold">Cutting</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="cuttingDie" value="die-cutting">
+                                <label class="form-check-label" for="cuttingDie">Die Cutting</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="cuttingGill" value="gillnetting">
+                                <label class="form-check-label" for="cuttingGill">Gillnetting</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label d-block fw-bold">Foiling</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="foilingUv" value="uv-spot">
+                                <label class="form-check-label" for="foilingUv">UV Spot</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="foilingNormal"
+                                    value="normal-foiling">
+                                <label class="form-check-label" for="foilingNormal">Normal Foiling</label>
+                            </div>
+                        </div>
+
+                        <!-- Lamination -->
+                        <div class="col-12 mt-3">
+                            <label class="form-label fw-bold">Lamination</label>
+                            <div class="d-flex gap-4 flex-wrap">
+                                <!-- Thermal Group -->
+                                <div class="border p-2 rounded">
+                                    <span class="fw-semibold d-block mb-1">Thermal</span>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="lamination"
+                                            id="laminationThermalGloss" value="thermal-gloss">
+                                        <label class="form-check-label" for="laminationThermalGloss">Gloss</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="lamination"
+                                            id="laminationThermalMat" value="thermal-mat">
+                                        <label class="form-check-label" for="laminationThermalMat">Mat</label>
+                                    </div>
+                                </div>
+                                <!-- Normal Group -->
+                                <div class="border p-2 rounded">
+                                    <span class="fw-semibold d-block mb-1">Normal</span>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="lamination"
+                                            id="laminationNormalGloss" value="normal-gloss">
+                                        <label class="form-check-label" for="laminationNormalGloss">Gloss</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="lamination"
+                                            id="laminationNormalMat" value="normal-mat">
+                                        <label class="form-check-label" for="laminationNormalMat">Mat</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order & Delivery -->
+                        <div class="col-md-6 mt-3">
+                            <label for="orderDate" class="form-label">Order Placed Date</label>
+                            <input type="date" class="form-control" id="orderDate">
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <label for="orderType" class="form-label">Order Type</label>
+                            <select class="form-select" id="orderType" onchange="toggleDeliveryFields()">
+                                <option value="pickup">Pickup</option>
+                                <option value="delivery">Delivery</option>
+                            </select>
+                        </div>
+
+                        <!-- Conditional Delivery -->
+                        <div class="col-md-6 delivery-field" style="display: none;">
+                            <label for="deliveryDate" class="form-label">Delivery Date</label>
+                            <input type="date" class="form-control" id="deliveryDate">
+                        </div>
+                        <div class="col-md-12 delivery-field" style="display: none;">
+                            <label for="deliveryAddress" class="form-label">Delivery Address</label>
+                            <textarea class="form-control" id="deliveryAddress" rows="2"
+                                placeholder="Enter Delivery Address"></textarea>
+                        </div>
+
+                        <!-- Pricing -->
+                        <div class="col-md-3 mt-3">
+                            <label for="unitPrice" class="form-label">Unit Price (Rs.)</label>
+                            <input type="number" class="form-control" id="unitPrice" placeholder="0.00">
+                        </div>
+                        <div class="col-md-3 mt-3">
+                            <label for="serviceCharge" class="form-label">Service Charge</label>
+                            <input type="text" class="form-control" id="serviceCharge" value="25%" readonly>
+                        </div>
+                        <div class="col-md-3 mt-3">
+                            <label for="advanceAmount" class="form-label">Advance Amount (Rs.)</label>
+                            <input type="number" class="form-control" id="advanceAmount" placeholder="0.00">
+                        </div>
+                        <div class="col-md-3 mt-3">
+                            <label for="totalPrice" class="form-label">Total Price (Rs.)</label>
+                            <input type="number" class="form-control" id="totalPrice" placeholder="0.00" readonly>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="col-12 text-end mt-4 d-flex justify-content-end gap-2">
+                            <button type="submit" class="btn btn-teal">Generate Quotation</button>
+                            <button type="reset" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- search client Model -->
+    <div class="modal fade" id="searchCustomerModal" tabindex="-1" aria-labelledby="searchCustomerModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Search Client</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="searchClientName" class="form-label">Client Name</label>
+                                <input type="text" id="searchClientName" class="form-control" onkeyup="searchClient()">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="showSearchedClient " id="showSearchedClient" onclick="selectedClient()">
+                                <!-- Search results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- link js bootstrap -->
+    <script th:src="@{/css/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js}"></script>
+    <!-- link js -->
+    <script th:src="@{/js/order.js}"></script>
+
+
+</body>
+
+</html>

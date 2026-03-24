@@ -75,18 +75,8 @@
                     <!-- show employee data  -->
                     <tr>
 
-                        <td>test</td>
-                        <td>test</td>
-                        <td>200000000000</td>
-                        <td>2000-01-01</td>
-                        <td>Male</td>
-                        <td>[EMAIL_ADDRESS]</td>
-                        <td>0700000000</td>
-                        <td>123, Main Street, Colombo</td>
-                        <td>Manager</td>
-                        <td class="d-flex flex-row ">
-                            <button class="btn btn-teal px-3 py-2 ms-2">Edit </button>
-                            <button class="btn btn-red px-3 py-2 ms-2">Delete</button>
+                        <td colspan="10" class="text-center">
+                            Loading...
                         </td>
                     </tr>
                 </tbody>
@@ -113,13 +103,13 @@
                             <div class="mb-3 w-50">
                                 <label for="employeeName" class="form-label">Full Name: <span
                                         class="text-danger">*</span></label>
-                                <input type="text" class="form-control w-75 validetion" name="fullName"
+                                <input type="text" class="form-control w-75 validetion" name="fullname"
                                     id="employeeFullName" placeholder="Enter full name" onblur="setCallingName()">
                                 <p class="text-danger errorMessage"></p>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="employeeName" class="form-label">Calling Name</label>
-                                <input type="text" class="form-control w-75 validetion" name="callingName"
+                                <input type="text" class="form-control w-75 validetion" name="callingname"
                                     id="employeeName" placeholder="Enter calling name">
                                 <p class="text-danger errorMessage"></p>
                             </div>
@@ -158,7 +148,7 @@
                             <div class="mb-3 w-50">
                                 <label for="employeePhone" class="form-label">Phone Number: <span
                                         class="text-danger">*</span></label>
-                                <input type="tel" class="form-control w-75 validetion" name="phoneNo"
+                                <input type="tel" class="form-control w-75 validetion" name="phonenumber"
                                     onkeyup="validateMobileNo()" id="employeePhone" placeholder="Enter phone number">
                                 <p class="text-danger errorMessage"></p>
                             </div>
@@ -172,21 +162,21 @@
                             <div class="mb-3 w-50">
                                 <label for="jobposition" class="form-label">Position(Job Role): <span
                                         class="text-danger">*</span></label>
-                                <select class="form-control w-75" name="position" id="jobposition">
-                                    <option value="manager">Manager</option>
-                                    <option value="developer">Developer</option>
-                                    <option value="designer">Designer</option>
+                                <select class="form-control w-75" name="designationid" id="jobposition">
+                                    <option value="2">Manager</option>
+                                    <option value="3">Designer</option>
+                                    <option value="4">Operator</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div class="mb-3  d-flex flex-row justify-content-end align-items-center  gap-3">
+                        <div class="mb-3 flex-row justify-content-end align-items-center gap-3 viewmode d-flex">
 
-                            <button type="reset" class="btn btn-secondary ">clear</button>
+                            <button type="reset" class="btn btn-secondary " id="clearButton">clear</button>
                             <button type="reset" class="btn  btn-danger " data-bs-dismiss="modal"
                                 onclick="resetForm()">Cancel</button>
-                            <button type="submit" id="submitButton" class="btn btn-teal action-btn"
-                                onclick="validateEmptyFormData()">Add Employee</button>
+                            <button type="submit" id="submitButton" class="btn btn-teal action-btn">Add
+                                Employee</button>
                         </div>
                 </form>
             </div>

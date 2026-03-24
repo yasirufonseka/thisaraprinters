@@ -1,5 +1,7 @@
 package com.example.thisaraprinters.dto;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,14 +13,16 @@ import lombok.Setter;
 @Setter
 public class EmployeeDto {
 
-    private long id;
-    private String fullName;
-    private String callingName;
-    private String nic;
-    private String dob;
-    private String gender;
-    private String email;
-    private String phoneNo;
+    private String fullname;
+    private String callingname;
     private String address;
-    private String position;
+    private String email;
+    private String gender;
+    private LocalDate dob;
+    private String nic;
+    private String phonenumber;
+    private LocalDate addeddate;
+    private LocalDate updateddate;
+    private Integer designationid;
+
 }

@@ -166,10 +166,10 @@ const populateEmployeeTable = (data = employee) => {
             <td onclick="viewEmployee(${emp.id})">${emp.email}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.phonenumber}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.address}</td>
-            <td onclick="viewEmployee(${emp.id})">${emp.position}</td>
+            <td onclick="viewEmployee(${emp.id})">${emp.designationid.designation}</td>
             <td class="d-flex flex-row">
-                <button class="btn btn-teal px-3 py-2 ms-2"  onclick="updateEmployee(${emp.id})">Edit</button>
-                <button class="btn btn-red px-3 py-2 ms-2" onclick="deleteEmployee(${emp.id})">Delete</button>
+                <button class="btn btn-teal px-3 py-2 ms-2 viewform"  onclick="updateEmployee(${emp.id})">Edit</button>
+                <button class="btn btn-red px-3 py-2 ms-2 viewform" onclick="deleteEmployee(${emp.id})">Delete</button>
             </td>
         `;
         employeeTableBody.appendChild(row);
@@ -179,12 +179,20 @@ const populateEmployeeTable = (data = employee) => {
 //update employee
 const updateEmployee = (id) => {
     console.log(id);
-
     isUpdate = true;
+    isView = false;
     document.getElementById("submitButton").textContent = "Update Employee";
     document.querySelector(".modal-title").textContent = "Update Employee";
 
+    // Reset readOnly on all inputs (in case view mode was previously opened)
+    document.querySelectorAll(".validetion").forEach(input => {
+        input.readOnly = false;
+    });
+    const jobSelect = document.getElementById("jobposition");
+    if (jobSelect) jobSelect.disabled = false;
+
     //open employee form model
+    document.querySelector(".viewmode").classList.remove("d-none");
     const modal = new bootstrap.Modal(document.getElementById("employeeModal"));
     modal.show();
 
@@ -198,24 +206,40 @@ const updateEmployee = (id) => {
     document.getElementById("employeePhone").value = emp.phonenumber;
     document.querySelector(`input[name="gender"][value="${emp.gender}"]`).checked = true;
     document.querySelector(`textarea[name='address']`).value = emp.address;
-    document.querySelector(`select[name="position"] option[value="${emp.position}"]`).selected = true;
-    // Store the employee data 
-    document.getElementById("employeeFormData").dataset.employeeId = id;
-
-
+    document.querySelector(`select[name="designationid"] option[value="${emp.designationid.id}"]`).selected = true;
+    // Store the employee data
+    document.getElementById("employeeFormData").dataset.id = id;
 }
 
+const validateEmptyFormData = () => {
+    let isValid = true;
+    const inputs = document.querySelectorAll(".validetion");
+    inputs.forEach(input => {
+        if (input.value.trim() === "") {
+            const errorMsg = input.parentElement.querySelector(".errorMessage");
+            if (errorMsg) errorMsg.textContent = "Input field can't be empty";
+            input.classList.add("input-error");
+            isValid = false;
+        }
+    });
+    return isValid;
+};
 
 const employeeFormDataListener = (event) => {
     event.preventDefault();
+    if (!validateEmptyFormData()) {
+        return;
+    }
     const formData = new FormData(employeeFormData);
-    console.log("Form data collected:", Object.fromEntries(formData.entries()));
-    const employeeId = document.getElementById("employeeFormData").dataset.employeeId;
+    const convertToJSON = Object.fromEntries(formData.entries());
+    console.log("Form data collected:", convertToJSON);
+    const employeeId = document.getElementById("employeeFormData").dataset.id;
 
     // Store isUpdate before resetting it
     const shouldUpdate = isUpdate;
 
     isUpdate = false;
+    isView = false;
     document.getElementById("submitButton").textContent = "Add Employee";
     document.querySelector(".modal-title").textContent = "Add Employee";
 
@@ -224,8 +248,6 @@ const employeeFormDataListener = (event) => {
 
     }
 
-
-
     const url = shouldUpdate ? `/employees/update/${employeeId}` : "/employees/add/employee";
     const method = shouldUpdate ? "PUT" : "POST";
 
@@ -233,13 +255,12 @@ const employeeFormDataListener = (event) => {
     $.ajax({
         url: url,
         type: method,
-        data: new URLSearchParams(formData),
-        contentType: "application/x-www-form-urlencoded",
+        data: JSON.stringify(convertToJSON),
+        contentType: "application/json",
         dataType: "json",
         async: false,
     })
         .done(function (data, jqXHR) {
-
             swal.fire({
                 title: "Success",
                 text: shouldUpdate ? "Employee updated successfully!" : "Employee added successfully!",
@@ -251,13 +272,7 @@ const employeeFormDataListener = (event) => {
                 refreshEmployeeData();
                 window.location.href = "/employees/getemployees";
                 $('#employeeModal').modal('hide');
-
-
             });
-
-
-
-
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             console.error(shouldUpdate ? "Error updating employee:" : "Error adding employee:", textStatus, errorThrown);
@@ -270,19 +285,18 @@ const employeeFormDataListener = (event) => {
                 confirmButtonText: "OK"
             });
 
-
         })
         .always(function () {
             console.log("Request complete");
         });
 
-    $("#employeeModel").reset();
+    document.getElementById("employeeFormData").reset();
 };
 
 
 //employeeFormData.addEventListener("submit", employeeFormDataListener);
 
-// search employee 
+// search employee
 
 const searchEmployees = () => {
     const searchValue = document.getElementById("searchEmployee").value.trim().toLowerCase();
@@ -290,30 +304,38 @@ const searchEmployees = () => {
     const filterEmployee = employee.filter(emp => emp.fullname.toLowerCase().includes(searchValue) ||
         emp.callingname.toLowerCase().includes(searchValue) ||
         emp.nic.toLowerCase().includes(searchValue) ||
-        emp.email.toLowerCase().includes(searchValue) ||
-        emp.position.toLowerCase().includes(searchValue));
+        emp.email.toLowerCase().includes(searchValue));
     populateEmployeeTable(filterEmployee);
 }
 const resetForm = () => {
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
     document.getElementById("employeeFormData").reset();
     isUpdate = false;
     isView = false;
     document.getElementById("submitButton").textContent = "Add Employee";
     document.getElementById("submitButton").style.display = "block";
+    document.querySelector(".viewmode").classList.remove("d-none");
     document.querySelector(".modal-title").textContent = "Add Employee";
-    
+
     // Make all inputs editable again
     const inputs = document.querySelectorAll(".validetion");
     inputs.forEach(input => {
         input.readOnly = false;
     });
+    // Re-enable select
+    const jobSelect = document.getElementById("jobposition");
+    if (jobSelect) jobSelect.disabled = false;
 }
 
 const viewEmployee = (id) => {
 
     isView = true;
-    document.getElementById("submitButton").style.display = "none";
+    isUpdate = false;
     document.querySelector(".modal-title").textContent = "Employee Details";
+    document.querySelector(".viewmode").classList.add("d-none");
+
 
     //make inputs readonly
     const inputs = document.querySelectorAll(".validetion");
@@ -335,12 +357,9 @@ const viewEmployee = (id) => {
     document.getElementById("employeePhone").value = emp.phonenumber;
     document.querySelector(`input[name="gender"][value="${emp.gender}"]`).checked = true;
     document.querySelector(`textarea[name='address']`).value = emp.address;
-    document.querySelector(`select[name="position"] option[value="${emp.position}"]`).selected = true;
-
-
+    document.querySelector(`select[name="designationid"] option[value="${emp.designationid.id}"]`).selected = true;
 
 }
-
 
 const deleteEmployee = (id) => {
     swal.fire({

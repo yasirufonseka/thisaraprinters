@@ -1,12 +1,9 @@
 package com.example.thisaraprinters.controller;
 
 import com.example.thisaraprinters.dto.EmployeeDto;
-import com.example.thisaraprinters.model.EmployeeModel;
 import com.example.thisaraprinters.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -36,6 +33,7 @@ public class EmployeeController {
     @PostMapping("/add/employee")
     public ResponseEntity<?> addEmployee(@RequestBody EmployeeDto employee) {
         try {
+            System.out.println(employee.getFullname());
             employeeService.saveEmployee(employee);
             return ResponseEntity.ok(Map.of("message", "successfully added the employee"));
         } catch (Exception e) {
@@ -54,7 +52,7 @@ public class EmployeeController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateEmployee(@PathVariable("id") Long id, @RequestBody EmployeeDto employee) {
+    public ResponseEntity<?> updateEmployee(@PathVariable("id") Integer id, @RequestBody EmployeeDto employee) {
         try {
             employeeService.updateEmployee(id, employee);
             return ResponseEntity.ok(Map.of("message", "successfully updated the employee"));
@@ -64,7 +62,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteEmployee(@PathVariable("id") Long id) {
+    public ResponseEntity<?> deleteEmployee(@PathVariable("id") Integer id) {
         try {
             employeeService.deleteEmployee(id);
             return ResponseEntity.ok(Map.of("message", "successfully deleted the employee"));

@@ -1,0 +1,337 @@
+/* Container ekata background ekak */
+.tab-container {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 20px;
+}
+
+/* Tab header buttons styling */
+.tab-header {
+  display: flex;
+  gap: 5px;
+}
+
+.tab-btn {
+  padding: 10px 25px;
+  cursor: pointer;
+  border: none;
+  background-color: #1B263B;
+  /* Theme: Table Header Row / Dark Indigo Blue */
+  color: #FFFFFF;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+/* Click karala thiyena tab eka wenas karanna */
+.tab-btn.active {
+  background-color: #FFC107;
+  /* Theme: Add Employee Button / Golden Yellow */
+  color: #0D1B2A;
+  /* Theme: Top Navigation Bar / Midnight Blue */
+  font-weight: 700;
+}
+
+.tab-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Content area styling */
+.tab-content {
+  display: none;
+  /* Mulinma hide karanawa */
+  padding: 30px;
+  border: 1px solid #dee2e6;
+  background-color: #FFFFFF;
+  /* Theme: Table Rows / White */
+  border-radius: 0 8px 8px 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Image eke thiyena form card eka wage hadanna */
+.form-card {
+  background: #FFFFFF;
+  padding: 30px;
+  border-radius: 15px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* Theme Option B: Main Page Background - Light Greyish Blue Gradient */
+  background: linear-gradient(180deg, #ECE9E6 0%, #FFFFFF 100%);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+/* Navbar */
+.top-navbar {
+  /* Theme Option B: Top Navigation Bar - Midnight Blue */
+  background-color: #0D1B2A !important;
+}
+
+h2 {
+  font-weight: 700;
+  color: #FFFFFF;
+  /* Ensure text is white on dark navbar */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Buttons */
+.btn-gold,
+.btn-teal,
+.btn-danger {
+  border-radius: 6px;
+  padding: 6px 16px;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.btn-teal {
+  background-color: transparent !important;
+  border: 1px solid #17A2B8 !important;
+  color: #17A2B8 !important;
+}
+
+.btn-teal:hover {
+  background-color: #17A2B8 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger {
+  background-color: transparent !important;
+  border: 1px solid #DC3545 !important;
+  color: #DC3545 !important;
+}
+
+.btn-danger:hover {
+  background-color: #DC3545 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-gold {
+  background-color: transparent !important;
+  border: 1px solid #FFC107 !important;
+  color: #FFC107 !important;
+}
+
+.btn-gold:hover {
+  background-color: #FFC107 !important;
+  color: #0D1B2A !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Table Styles from colour.md */
+.tablestyle thead th {
+  background-color: #1B263B !important;
+  /* Theme: Dark Indigo Blue */
+  color: #FFFFFF !important;
+  border-color: #1B263B !important;
+  vertical-align: middle;
+}
+
+.tablestyle tbody tr {
+  background-color: #FFFFFF !important;
+  /* Theme: White */
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.tablestyle tbody tr:hover {
+  background-color: #E3F2FD !important;
+  /* Theme: Hover Highlight */
+}
+
+
+/* Table Styling */
+.tablestyle {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0;
+  /* Entrance Animation */
+  animation: slideUpFadeIn 0.8s ease-out;
+}
+
+.tablestyle thead {
+  /* Theme Option B: Table Header Row - Dark Indigo Blue */
+  background-color: #1B263B;
+  color: #FFFFFF;
+}
+
+.tablestyle th {
+  padding: 16px 12px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  border: none;
+}
+
+.tablestyle tbody tr {
+  /* Theme Option B: Table Rows - White */
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #e8e8e8;
+  transition: background-color 0.2s, transform 0.2s;
+
+  /* Staggered Entrance Animation */
+  opacity: 0;
+  animation: slideUpFadeIn 0.5s ease-out forwards;
+}
+
+/* Staggered Delays for first 10 rows */
+.tablestyle tbody tr:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.tablestyle tbody tr:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.tablestyle tbody tr:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.tablestyle tbody tr:nth-child(4) {
+  animation-delay: 0.25s;
+}
+
+.tablestyle tbody tr:nth-child(5) {
+  animation-delay: 0.3s;
+}
+
+.tablestyle tbody tr:nth-child(6) {
+  animation-delay: 0.35s;
+}
+
+.tablestyle tbody tr:nth-child(7) {
+  animation-delay: 0.4s;
+}
+
+.tablestyle tbody tr:nth-child(8) {
+  animation-delay: 0.45s;
+}
+
+.tablestyle tbody tr:nth-child(9) {
+  animation-delay: 0.5s;
+}
+
+.tablestyle tbody tr:nth-child(n+10) {
+  animation-delay: 0.55s;
+}
+
+
+.tablestyle td {
+  padding: 14px 12px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: #333;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.customerSearch {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+/* search client */
+.showSearchedClient {
+  display: flex;
+  flex-direction: row;
+  border: none;
+  gap: 10px;
+}
+
+/* Theme Option B: Table Row Hover Highlight */
+.tablestyle tbody tr:hover {
+  background-color: #E3F2FD;
+  /* Subtle lift effect on hover if desired, but color change is usually enough for rows */
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Styling to match Elegant Ink Theme */
+.modal-content {
+  border-radius: 15px;
+  /* Softer rounded corners */
+  border: none;
+  /* Remove default border */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  /* Deep shadow for depth */
+  overflow: hidden;
+  /* Ensure header radius is respected */
+}
+
+.modal-header {
+  background-color: #0D1B2A;
+  /* Midnight Blue matching Top Navbar */
+  color: #FFFFFF;
+  border-bottom: 3px solid #FFC107;
+  /* Golden Yellow accent line at bottom of header */
+}
+
+.modal-title {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Custom styling for close button to be white on dark background */
+.modal-header .btn-close {
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+  opacity: 0.8;
+}
+
+.modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+.modal-body {
+  background-color: #FFFFFF;
+  /* White */
+  padding: 30px;
+}
+
+.modal-footer {
+  background-color: #F8F9FA;
+  /* Slightly off-white for footer to distinguish */
+  border-top: 1px solid #e9ecef;
+}
+
+/* Modal Entrance Animation */
+.modal.fade .modal-dialog {
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.modal.show .modal-dialog {
+  transform: scale(1);
+  opacity: 1;
+}

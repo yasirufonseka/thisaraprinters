@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ThisaraprintersApplication<thisaraprinters>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.example.thisaraprinters.ThisaraprintersApplication",
+            "projectName": "thisaraprinters",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -8,7 +8,8 @@
     <!-- link bootstrap -->
     <link rel="stylesheet" th:href="@{/css/bootstrap-5.3.7-dist/css/bootstrap.min.css}">
     <!-- link css -->
-    <link rel="stylesheet" th:href="@{/css/user.css}"></head>
+    <link rel="stylesheet" th:href="@{/css/user.css}">
+</head>
 
 <body>
     <!-- user management header -->
@@ -45,7 +46,8 @@
                             </svg></span>
                         <input type="text" class="searchInput" id="searchUser" placeholder="Search User">
                     </div>
-                    <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#addUserModal">Add
+                    <button class="btn btn-gold" data-bs-toggle="modal" onclick="prepareAddUser()"
+                        data-bs-target="#addUserModal">Add
                         User</button>
                 </div>
 
@@ -57,21 +59,24 @@
                                 <th>Employee</th>
                                 <th>Username</th>
                                 <th>Email</th>
-                                <th>Role</th>
+                                <th>Designation</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <!-- show user data -->
-                            <tr th:each = "user : ${users}">
+                            <tr th:each="user : ${users}">
                                 <td th:text="${user.employeeid.fullname}">John Doe (E001)</td>
                                 <td th:text="${user.username}"></td>
                                 <td th:text="${user.employeeid.email}"></td>
-                               <td th:text="${user.employeeid.designationid.designation}">johndoe@example.com</td>
-                                <td ><span class="badge" th:text="${user.status}" th:class="${user.status == 'Active' ? 'badge bg-success' : 'badge bg-danger'}"></span></td>
+                                <td th:text="${user.employeeid.designationid.designation}">johndoe@example.com</td>
+                                <td><span class="badge" th:text="${user.status}"
+                                        th:class="${user.status == 'Active' ? 'badge bg-success' : 'badge bg-danger'}"></span>
+                                </td>
                                 <td class="d-flex flex-row justify-content-center gap-2">
-                                    <button class="btn btn-teal px-3 py-2">Edit</button>
+                                    <button class="btn btn-teal px-3 py-2"
+                                        th:onclick="|updateUser(${user.id})|">Edit</button>
                                     <button class="btn btn-red px-3 py-2">Delete</button>
                                 </td>
                             </tr>
@@ -131,52 +136,53 @@
         <div class="modal-dialog modal-dialog-centered modal-xl supModal">
             <div class="modal-content p-4 shadow-lg rounded-4">
                 <div class="modal-header d-inline-flex justify-content-between align-items-center p-3">
-                    <h4 class="modal-title text-white">Add New User</h4>
-                    <button type="button" class="btn btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                    <h4 class="modal-title text-white" id="addUserModalHeader">Add New User</h4>
+                    <button type="reset" class="btn btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close" ></button>
                 </div>
                 <div class="modal-body">
-                    <form class="d-flex flex-row flex-wrap">
+                    <form class="d-flex flex-row flex-wrap" id="userFormData" onsubmit="submitUser(event)">
                         <div class="d-flex flex-row flex-wrap w-100">
                             <div class="mb-3 w-50">
                                 <label for="userEmployee" class="form-label">Employee: <span
                                         class="text-danger">*</span></label>
-                                <select class="form-select w-75" id="userEmployee">
+                                <select class="form-select w-75" id="userEmployee" name="employeeid">
                                     <option value="" selected disabled>Select Employee</option>
-                                    <option value="E001">John Doe (E001)</option>
-                                    <option value="E002">Jane Smith (E002)</option>
                                 </select>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="username" class="form-label">Username: <span
                                         class="text-danger">*</span></label>
-                                <input type="text" class="form-control w-75" id="username"
+                                <input type="text" class="form-control w-75" id="username" name="username"
                                     placeholder="Enter username">
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="userPassword" class="form-label">Password: <span
                                         class="text-danger">*</span></label>
-                                <input type="password" class="form-control w-75" id="userPassword" placeholder="Enter password">
+                                <input type="password" class="form-control w-75" id="userPassword" name="password"
+                                    placeholder="Enter password">
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="userEmail" class="form-label">Email: <span
                                         class="text-danger">*</span></label>
-                                <input type="email" class="form-control w-75" id="userEmail" placeholder="Enter email">
+                                <input type="email" class="form-control w-75" id="userEmail" name="email"
+                                    placeholder="Enter email">
                             </div>
                             <div class="mb-3 w-50">
-                                <label for="userRole" class="form-label">Role: <span
-                                        class="text-danger">*</span></label>
-                                <select class="form-select w-75" id="userRole">
-                                    <option value="" selected disabled>Select Role</option>
-                                    <option value="Admin">Admin</option>
-                                    <option value="Manager">Manager</option>
-                                    <option value="User">User</option>
-                                </select>
+                                <label for="userNote" class="form-label">Note: </label>
+                                <input type="text" class="form-control w-75" id="userNote" name="note"
+                                    placeholder="Enter note Optional">
+                            </div>
+                            <div class="mb-3 w-50">
+                                <label class="form-label">Role: <span class="text-danger">*</span></label>
+                                <div class="d-flex flex-row gap-3 flex-wrap" id="userRoleContainer">
+                                    <!-- roles will be loaded dynamically -->
+                                </div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="userStatus" class="form-label">Status: <span
                                         class="text-danger">*</span></label>
-                                <select class="form-select w-75" id="userStatus">
+                                <select class="form-select w-75" id="userStatus" name="status">
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
                                 </select>
@@ -192,9 +198,10 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Privilege Modal -->
-    <div class="modal fade" id="addPrivilegeModal" tabindex="-1" aria-labelledby="addPrivilegeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addPrivilegeModal" tabindex="-1" aria-labelledby="addPrivilegeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl supModal">
             <div class="modal-content p-4 shadow-lg rounded-4">
                 <div class="modal-header d-inline-flex justify-content-between align-items-center p-3">
@@ -258,7 +265,21 @@
         </div>
     </div>
 
+
+
+    <!-- link jquery -->
+    <script th:src="@{/js/jquery-4.0.0.min.js}"></script>
+
+    <!-- link sweetalert css and js -->
+    <link rel="stylesheet" th:href="@{/sweetalert2/sweetalert2.min.css}">
+    <script th:src="@{/sweetalert2/sweetalert2.min.js}"></script>
+
+    <!-- link common js file -->
+    <script th:src="@{/js/common.js}"></script>
+
+    <!-- link user js file -->
     <script th:src="@{/js/user.js}"></script>
+
     <!-- link js bootstrap -->
     <script th:src="@{/css/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js}"></script>
 </body>

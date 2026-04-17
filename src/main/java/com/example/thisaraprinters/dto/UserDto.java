@@ -1,24 +1,22 @@
 package com.example.thisaraprinters.dto;
 
-import java.sql.Date;
+import java.time.LocalDate;
+import java.util.List;
 
-import org.hibernate.validator.constraints.UniqueElements;
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Data;
 
 @Data
 public class UserDto {
-
+    
     private String username;
     private String password;
-    private Date addeddate;
-    private Date updatedate;
+    private LocalDate addeddate;
+    private LocalDate updatedate;
     private String note;
     private String userphoto;
     private String status;
-    private Long employeeid;
+    private Integer employeeid;
+    private List<Integer> roleIds;
+    private String email;
 
 }

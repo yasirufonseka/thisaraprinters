@@ -24,7 +24,7 @@ private Long id;
 private Long customersid;
 private String papertype;
 private String productsize;
-private int quantity;
+private Integer quantity;
 private String color;
 private String quotationdescription;
 private String cuttingtype;
@@ -35,7 +35,7 @@ private double quotationamount;
 private double advanceamount;
 private LocalDate quotationdate;
 private String quotationstatus;
-private int quotationvalidity;
+private Integer quotationvalidity;
 private LocalDate orderplaceddate;
 private LocalDate addeddate;
 

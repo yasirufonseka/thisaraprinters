@@ -1,25 +1,23 @@
-//add tabs like structure for quotation and order
+//add tabs like structure for quatation and order
 function openTab(evt, tabName) {
   // hide all content boxes
-  const tabContent = document.getElementsByClassName("tab-content");
-  for (let i = 0; i < tabContent.length; i++) {
+  var i, tabContent, tabButtons;
+  tabContent = document.getElementsByClassName("tab-content");
+  for (i = 0; i < tabContent.length; i++) {
     tabContent[i].style.display = "none";
   }
 
   // remove active class from all buttons
-  const tabButtons = document.getElementsByClassName("tab-btn");
-  for (let i = 0; i < tabButtons.length; i++) {
-    tabButtons[i].classList.remove("active");
+  tabButtons = document.getElementsByClassName("tab-btn");
+  for (i = 0; i < tabButtons.length; i++) {
+    tabButtons[i].className = tabButtons[i].className.replace(" active", "");
   }
 
   // show clicked content box and add active class to clicked button
-  const selectedTab = document.getElementById(tabName);
-  if (selectedTab) {
-    selectedTab.style.display = "block";
-    evt.currentTarget.classList.add("active");
-  }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
 }
-//show delivery fields based on the order type
+
 function toggleDeliveryFields() {
   const orderType = document.getElementById('orderType').value;
   const deliveryFields = document.querySelectorAll('.delivery-field');
@@ -43,27 +41,37 @@ const sampleClients = [
 //open customer search model
 const openClientSearch = (event, modalId) => {
   event.preventDefault();
-  const modalElem = document.getElementById(modalId);
-  if (modalElem) {
-    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElem);
-    modalInstance.show();
-  }
+  const modal = document.getElementById(modalId);
+  modal.style.display = 'block';
+  modal.classList.add('show');
+  modal.setAttribute('aria-hidden', 'false');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('tabindex', '-1');
+
+}
+//close customer search  model
+const closeSearchModel = (event, modelId) => {
+  event.preventDefault();
+  const modal = document.getElementById(modelId);
+  modal.style.display = 'none';
+  modal.classList.remove('show');
+  //modal.setAttribute('aria-hidden', 'true');
+  modal.setAttribute('aria-modal', 'false');
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('tabindex', '0');
 }
 
 //search client from the client database
 function searchClient() {
   const searchClientsName = document.getElementById('searchClientName').value;
+  // console.log(searchClientsName);
+
   const showSearchedClientDiv = document.getElementById('showSearchedClient');
 
-  if (!searchClientsName) {
-    showSearchedClientDiv.innerHTML = '';
-    return;
-  }
-
   // filter sample data
-  const findClient = sampleClients.find(client => 
-    client.name.toLowerCase().includes(searchClientsName.toLowerCase())
-  );
+  const findClient = sampleClients.find(client => client.name.toLocaleLowerCase().includes(searchClientsName.toLocaleLowerCase()));
+  // console.log(findClient);
 
   if (findClient) {
     // Store the full client object in the dataset for retrieval
@@ -74,7 +82,7 @@ function searchClient() {
     <div class="col-md-12">
       <div class="card" style="cursor: pointer;">
         <div class="card-body">
-          <h5 class="card-title">${findClient.name}</h5>
+          <h3 class="card-title">${findClient.name}</h3>
           <p class="card-text">${findClient.email}</p>
         </div>
       </div>
@@ -83,18 +91,18 @@ function searchClient() {
   } else {
     // Handle case where no client is found
     delete showSearchedClientDiv.dataset.client;
-    showSearchedClientDiv.innerHTML = '<p class="text-muted ms-3">No client found</p>';
+    showSearchedClientDiv.innerHTML = '';
   }
 }
 
 function selectedClient() {
   //get the selected client from the showSearchedClient div
-  const showSearchedClientDiv = document.getElementById('showSearchedClient');
+  const showSearchedClient = document.getElementById('showSearchedClient');
 
-  // Check if we have a client stored
-  if (showSearchedClientDiv.dataset.client) {
-    const selectedClient = JSON.parse(showSearchedClientDiv.dataset.client);
-    console.log("Selected Client:", selectedClient);
+  // Check if we have a client stored (divs don't have .value)
+  if (showSearchedClient.dataset.client) {
+    const selectedClient = JSON.parse(showSearchedClient.dataset.client);
+    console.log(selectedClient);
 
     // Populate the customer name field
     const customerNameInput = document.getElementById('customerName');
@@ -102,24 +110,22 @@ function selectedClient() {
       customerNameInput.value = selectedClient.name;
     }
 
-    // Close the search modal using Bootstrap API
-    const modalElem = document.getElementById('searchCustomerModal');
-    const modalInstance = bootstrap.Modal.getInstance(modalElem);
-    if (modalInstance) {
-      modalInstance.hide();
-    }
+    // Optional: Close the modal after selection
+    const modal = document.getElementById('searchCustomerModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+  //  modal.setAttribute('aria-hidden', 'true');
+    modal.setAttribute('aria-modal', 'false');
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('tabindex', '0');
+
+    //Using the existing close logic if accessible or bootstrap methods
+    bootstrap.Modal.getInstance(modal).hide();
+
+    
+
   }
   else {
     alert('Please select a client');
   }
-}
-
-//get all quotations 
-function getAllQuotations() {
-  const url = '/quotations/get/all';
-  const type = 'GET';
-  const dataType = 'json';
-  const data = getHTTPService(url, type, dataType);
-  return data;
-}
-
+} 

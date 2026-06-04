@@ -1,19 +1,3 @@
-/* Global Resets and Font */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    /* Theme Option B: Main Page Background - Light Greyish Blue Gradient */
-    background: linear-gradient(180deg, #ECE9E6 0%, #FFFFFF 100%);
-    min-height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-}
-
-/* Search Bar */
 .searchBar {
     display: flex;
     flex-direction: row;
@@ -42,16 +26,28 @@ body {
     color: #7d7c7c;
 }
 
+/* Global Resets and Font */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(180deg, #ECE9E6 0%, #FFFFFF 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
 /* Navbar */
 .top-navbar {
-    /* Theme Option B: Top Navigation Bar - Midnight Blue */
-    background-color: #0D1B2A !important;
+    background-color: #1A1A1A !important;
 }
 
 h2 {
     font-weight: 700;
     color: #FFFFFF;
-    /* Ensure text is white on dark navbar */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -65,7 +61,6 @@ h2 {
     border: none;
 }
 
-/* Ensure .card doesn't override with dark background */
 .card {
     background-color: #FFFFFF !important;
     border: none;
@@ -79,14 +74,12 @@ h2 {
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 0;
-    /* Entrance Animation */
     animation: slideUpFadeIn 0.8s ease-out;
 }
 
 .employeeTable thead {
-    /* Theme Option B: Table Header Row - Dark Indigo Blue */
-    background-color: #1B263B;
-    color: #FFFFFF;
+    background-color: #1A1A1A;
+    color: #666666;
 }
 
 .employeeTable th {
@@ -99,17 +92,13 @@ h2 {
 }
 
 .employeeTable tbody tr {
-    /* Theme Option B: Table Rows - White */
     background-color: #FFFFFF;
     border-bottom: 1px solid #e8e8e8;
     transition: background-color 0.2s, transform 0.2s;
-
-    /* Staggered Entrance Animation */
     opacity: 0;
     animation: slideUpFadeIn 0.5s ease-out forwards;
 }
 
-/* Staggered Delays for first 10 rows */
 .employeeTable tbody tr:nth-child(1) {
     animation-delay: 0.1s;
 }
@@ -130,51 +119,31 @@ h2 {
     animation-delay: 0.3s;
 }
 
-.employeeTable tbody tr:nth-child(6) {
+.employeeTable tbody tr:nth-child(n+6) {
     animation-delay: 0.35s;
 }
-
-.employeeTable tbody tr:nth-child(7) {
-    animation-delay: 0.4s;
-}
-
-.employeeTable tbody tr:nth-child(8) {
-    animation-delay: 0.45s;
-}
-
-.employeeTable tbody tr:nth-child(9) {
-    animation-delay: 0.5s;
-}
-
-.employeeTable tbody tr:nth-child(n+10) {
-    animation-delay: 0.55s;
-}
-
 
 .employeeTable td {
     padding: 14px 12px;
     text-align: center;
     vertical-align: middle;
     font-size: 0.9rem;
-    color: #333;
+    color: #666666;
     border-bottom: 1px solid #e8e8e8;
 }
 
-/* Theme Option B: Table Row Hover Highlight */
 .employeeTable tbody tr:hover {
     background-color: #E3F2FD;
-    /* Subtle lift effect on hover if desired, but color change is usually enough for rows */
 }
 
-/* Buttons */
-
-/* "Add Employee" Button Custom Class */
 /* Buttons */
 .btn-gold,
 .btn-teal,
 .btn-red,
 .btn-edit,
-.btn-delete {
+.btn-delete,
+.btn-outline-primary,
+.btn-outline-warning {
     border-radius: 6px;
     padding: 6px 16px;
     transition: all 0.2s ease;
@@ -184,13 +153,13 @@ h2 {
 .btn-teal,
 .btn-edit {
     background-color: transparent !important;
-    border: 1px solid #17A2B8 !important;
-    color: #17A2B8 !important;
+    border: 1px solid #00AEEF !important;
+    color: #00AEEF;
 }
 
 .btn-teal:hover,
 .btn-edit:hover {
-    background-color: #17A2B8 !important;
+    background-color: #00AEEF !important;
     color: #FFFFFF !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -199,13 +168,13 @@ h2 {
 .btn-red,
 .btn-delete {
     background-color: transparent !important;
-    border: 1px solid #DC3545 !important;
-    color: #DC3545 !important;
+    border: 1px solid #ED008C !important;
+    color: #ED008C !important;
 }
 
 .btn-red:hover,
 .btn-delete:hover {
-    background-color: #DC3545 !important;
+    background-color: #ED008C !important;
     color: #FFFFFF !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -213,21 +182,198 @@ h2 {
 
 .btn-gold {
     background-color: transparent !important;
-    border: 1px solid #FFC107 !important;
-    color: #FFC107 !important;
+    border: 1px solid #FFF200 !important;
+    color: #FFF200;
 }
 
 .btn-gold:hover {
-    background-color: #FFC107 !important;
-    color: #0D1B2A !important;
+    background-color: #FFF200 !important;
+    color: #1A1A1A !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Default Bootstrap overrides if classes not swapped yet, to ensure look works immediately */
+.btn-outline-primary {
+    border-color: #00AEEF !important;
+    color: #00AEEF !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: #00AEEF !important;
+    color: #fff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-outline-warning {
+    border-color: #FFF200 !important;
+    color: #FFF200 !important;
+}
+
+.btn-outline-warning:hover {
+    background-color: #FFF200 !important;
+    color: #1A1A1A !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Animations */
+@keyframes slideUpFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Styling */
+.supModal {
+    max-width: 900px !important;
+    width: 95% !important;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 12px !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    color: #0a3622;
+    border-bottom: 1px solid #1A1A1A;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+    font-weight: 700;
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.modal-body {
+    padding: 30px;
+    background-color: #FFFFFF;
+}
+
+/* Form Controls */
+.form-label {
+    font-weight: 600;
+    color: #1A1A1A;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border: 2px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: all 0.3s ease;
+}
+
+.form-select {
+    border: 2px solid #E0E0E0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #00AEEF;
+    box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.2);
+}
+
+.action-btn {
+    width: 180px !important;
+    height: 40px !important;
+    display: inline-block !important;
+}
+
+/* Tab Container */
+.tab-container {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 20px;
+}
+
+/* Tab header buttons styling */
+.tab-header {
+    display: flex;
+    gap: 5px;
+}
+
+.tab-btn {
+    padding: 10px 25px;
+    cursor: pointer;
+    border: none;
+    background-color: #1A1A1A;
+    color: #FFFFFF;
+    border-radius: 8px 8px 0 0;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+    background-color: #00AEEF;
+    color: #FFFFFF;
+    font-weight: 700;
+}
+
+.tab-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* Content area styling */
+.tab-content {
+    display: none;
+    padding: 30px;
+    border: 1px solid #dee2e6;
+    background-color: #FFFFFF;
+    border-radius: 0 8px 8px 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.form-card {
+    background: #FFFFFF;
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.badge {
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+/* Validation Styles */
+.input-error {
+    border-color: #ED008C !important;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 0.25rem rgba(237, 0, 140, 0.25) !important;
+}
+
+/* Form Section Headers */
+.section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4b5563;
+    letter-spacing: 1.5px;
+}
+
+.input-group-text {
+    border-color: #E0E0E0;
+}
+
 .btn-secondary {
     background: linear-gradient(135deg, #6C757D 0%, #5A6268 100%) !important;
-    /* Modern grey gradient for Reset/Secondary */
     border: none;
     color: #fff !important;
     padding: 10px 32px !important;
@@ -247,228 +393,4 @@ h2 {
     background: linear-gradient(135deg, #5A6268 0%, #495057 100%) !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4) !important;
-}
-
-/* Overriding success/danger just in case, but preferred to use new classes */
-.btn-success {
-    background: linear-gradient(135deg, #17A2B8 0%, #00D4FF 100%) !important;
-    border: none !important;
-    color: #fff !important;
-    padding: 10px 32px !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.95rem !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3) !important;
-    height: 44px !important;
-    min-width: 140px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.btn-success:hover {
-    background: linear-gradient(135deg, #00D4FF 0%, #17A2B8 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4) !important;
-}
-
-.btn-danger {
-    background: linear-gradient(135deg, #DC3545 0%, #E74C5C 100%) !important;
-    /* Red gradient as Delete */
-    border: none !important;
-    color: #fff !important;
-    padding: 10px 32px !important;
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.95rem !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3) !important;
-    height: 44px !important;
-    min-width: 140px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #E74C5C 0%, #DC3545 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
-}
-
-/* Top Navbar Button Specific Override if class not added yet */
-.top-navbar .btn-secondary {
-    background-color: #FFC107 !important;
-    color: #0D1B2A !important;
-    font-weight: 700;
-}
-
-.top-navbar .btn-secondary:hover {
-    background-color: #FFB300 !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-
-/* Modal Styling */
-.empModal {
-    max-width: 900px !important;
-    width: 95% !important;
-}
-
-.modal-content {
-    border: none;
-    border-radius: 16px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
-    background-color: #FFFFFF;
-    backdrop-filter: blur(10px);
-    animation: modalSlideIn 0.4s ease-out;
-}
-
-.modal-header {
-    background: linear-gradient(135deg, #0D1B2A 0%, #1B263B 100%);
-    /* Modern gradient header */
-    color: #FFFFFF;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px 16px 0 0;
-    padding: 24px 30px;
-}
-
-.modal-title {
-    font-weight: 700;
-    font-size: 1.3rem;
-    letter-spacing: 0.5px;
-}
-
-.btn-close-white {
-    filter: invert(1) grayscale(100%) brightness(200%);
-    transition: all 0.2s ease;
-    opacity: 0.8;
-}
-
-.btn-close-white:hover {
-    opacity: 1;
-    transform: rotate(90deg);
-}
-
-.modal-body {
-    padding: 30px;
-    background-color: #FFFFFF;
-}
-
-/* Modal Footer Buttons */
-.modal-footer {
-    background-color: #F8F9FA;
-    border-top: 1px solid #E9ECEF;
-    border-radius: 0 0 16px 16px;
-    padding: 20px 30px;
-    gap: 12px;
-}
-
-.modal-footer .btn {
-    border-radius: 8px;
-    padding: 10px 24px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-}
-
-/* Save/Submit Button - Modern Teal Gradient */
-.modal-footer .btn-primary,
-.modal-footer .btn-success {
-    background: linear-gradient(135deg, #17A2B8 0%, #00D4FF 100%) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
-}
-
-.modal-footer .btn-primary:hover,
-.modal-footer .btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
-}
-
-/* Cancel/Close Button - Modern Grey */
-.modal-footer .btn-secondary {
-    background-color: #E9ECEF !important;
-    color: #495057 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.modal-footer .btn-secondary:hover {
-    background-color: #DEE2E6 !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-/* Delete Button in Modal - Modern Red */
-.modal-footer .btn-danger {
-    background-color: #DC3545 !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
-}
-
-.modal-footer .btn-danger:hover {
-    background: linear-gradient(135deg, #DC3545 0%, #E74C5C 100%) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
-}
-
-/* Modal Animation */
-@keyframes modalSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-/* Form Controls */
-.form-label {
-    font-weight: 600;
-    color: #1B263B;
-    margin-bottom: 8px;
-}
-
-.form-control {
-    border: 2px solid #E0E0E0;
-    border-radius: 8px;
-    padding: 10px 12px;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #17A2B8;
-    box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
-}
-
-.action-btn {
-    width: 180px !important;
-    height: 40px !important;
-    display: inline-block !important;
-}
-
-/* Animations */
-@keyframes slideUpFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Validation Styles */
-.input-error {
-    border-color: #DC3545 !important;
-}
-
-.input-error:focus {
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
 }

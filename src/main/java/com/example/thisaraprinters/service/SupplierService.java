@@ -1,0 +1,252 @@
+package com.example.thisaraprinters.service;
+
+import com.example.thisaraprinters.config.EmailService;
+import com.example.thisaraprinters.dto.PriceRequestDto;
+import com.example.thisaraprinters.dto.PriceRequestReplyDto;
+import com.example.thisaraprinters.dto.SupplierDto;
+import com.example.thisaraprinters.model.*;
+import com.example.thisaraprinters.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class SupplierService {
+
+
+    private final SupplierRepo supplierRepo;
+    private final MaterialRepo materialRepo;
+    private final PriceRequestRepo  priceRequestRepo;
+    private final PriceRequestReplyRepo priceRequestReplyRepo;
+    private final PurchaseOrderRepo purchaseOrderRepo;
+    private final CategoryRepo categoryRepo;
+    @Autowired
+     private EmailService emailService;
+
+    SupplierService(SupplierRepo supplierRepo, MaterialRepo materialRepo, PriceRequestRepo  priceRequestRepo, PriceRequestReplyRepo priceRequestReplyRepo, PurchaseOrderRepo purchaseOrderRepo,CategoryRepo categoryRepo) {
+        this.supplierRepo = supplierRepo;
+        this.materialRepo = materialRepo;
+        this.priceRequestRepo = priceRequestRepo;
+        this.priceRequestReplyRepo = priceRequestReplyRepo;
+        this.purchaseOrderRepo = purchaseOrderRepo;
+        this.categoryRepo = categoryRepo;
+    }
+
+    public List<Supplier> getAllUsers() {
+            return supplierRepo.findAll();
+    }
+
+    public List<Supplier> getAllSuppliers() {
+        return getAllUsers();
+    }
+    
+    public List<Materials> getAllMaterials() {
+        return materialRepo.findAll();
+    }
+
+    public List<Category> getAllCategory(){
+        return categoryRepo.findAll();
+    }
+
+    public String addSupllier(SupplierDto data) {
+        try {
+            Supplier supplier = new Supplier();
+
+            //assign supplier's data into new object
+            supplier.setCompanyname(data.getCompanyname());
+            supplier.setEmail(data.getEmail());
+            supplier.setContactperson(data.getContactperson());
+            supplier.setContact(data.getContact());
+            supplier.setAddress(data.getAddress());
+            supplier.setDescription(data.getDescription());
+            supplier.setStatus(data.getStatus());
+            //find materails id's
+
+            if (data.getCategory() != null) {
+                List<Integer> categoryIds = data.getCategory()
+                        .stream()
+                        .map(Category::getId)
+                        .collect(Collectors.toList());
+                List<Category> manageCategories = categoryRepo.findAllById(categoryIds);
+                supplier.setCategory(manageCategories);
+            }
+            //save supplier
+            supplierRepo.save(supplier);
+            return "supplier added succesfully";
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Supplier getSupplierById(int id) {
+        Supplier suplierObject =  supplierRepo.findById(id).get();
+        return suplierObject;
+    }
+
+    public String updateSupplier(SupplierDto supplierData, int id) {
+        try {
+            Supplier exsistingSupplier = supplierRepo.findById(id).get();
+
+            exsistingSupplier.setEmail(supplierData.getEmail());
+            exsistingSupplier.setCompanyname(supplierData.getCompanyname());
+            exsistingSupplier.setContactperson(supplierData.getContactperson());
+            exsistingSupplier.setContact(supplierData.getContact());
+            exsistingSupplier.setAddress(supplierData.getAddress());
+            exsistingSupplier.setDescription(supplierData.getDescription());
+            exsistingSupplier.setStatus(supplierData.getStatus());
+            exsistingSupplier.setCategory(supplierData.getCategory());
+            supplierRepo.save(exsistingSupplier);
+            return "update successful";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public String getPricerequest(PriceRequestDto request) {
+        try {
+
+            PriceRequest newPriceRequest = new PriceRequest();
+            newPriceRequest.setMaterialcategory(request.getMaterialcategory());
+            newPriceRequest.setItemSpecification(request.getItemSpecification());
+            newPriceRequest.setQuantity(request.getQuantity());
+            newPriceRequest.setDeadline(request.getDeadline());
+            newPriceRequest.setCreateDate(LocalDate.now());
+            newPriceRequest.setMessage(request.getMessage());
+            newPriceRequest.setRequeststatus("Pending");
+            newPriceRequest.setSupplierlist(request.getSupplierlist());
+
+            PriceRequest savedRequest = priceRequestRepo.save(newPriceRequest);
+
+            //fetch full supplier records from DB (frontend only sends {id}, email would be null otherwise)
+            List<Integer> supplierIds = request.getSupplierlist()
+                    .stream()
+                    .map(Supplier::getId)
+                    .collect(Collectors.toList());
+            List<Supplier> suppliers = supplierRepo.findAllById(supplierIds);
+            String materialCategory = request.getMaterialcategory();
+            String itemSpecification = request.getItemSpecification();
+            String message = request.getMessage();
+            emailService.sendEmailForPriceRequest(suppliers, materialCategory, itemSpecification, message, savedRequest.getId());
+
+            return "Price request send successfully";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Save a supplier's reply to a price request
+    public String savePriceRequestReply(PriceRequestReplyDto dto) {
+        try {
+            PriceRequest priceRequest = priceRequestRepo.findById(dto.getPriceRequestId())
+                    .orElseThrow(() -> new RuntimeException("Price request not found"));
+            Supplier supplier = supplierRepo.findById(dto.getSupplierId())
+                    .orElseThrow(() -> new RuntimeException("Supplier not found"));
+
+            PriceRequestReply reply = new PriceRequestReply();
+            reply.setUnitPrice(dto.getUnitPrice());
+            reply.setDeliveryCharge(dto.getDeliveryCharge());
+            reply.setTotalAmount(dto.getTotalAmount());
+            reply.setQuantity(dto.getQuantity());
+            reply.setDeliveryDate(dto.getDeliveryDate());
+            reply.setReplyDate(LocalDate.now());
+            reply.setPriceRequest(priceRequest);
+            reply.setSupplier(supplier);
+
+            priceRequestReplyRepo.save(reply);
+
+            // Auto-set status to Completed when a supplier replies
+            priceRequest.setRequeststatus("Completed");
+            priceRequestRepo.save(priceRequest);
+
+            return "Reply submitted successfully";
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Get all price requests for the admin tab
+    public List<PriceRequest> getAllPriceRequests() {
+        return priceRequestRepo.findAll();
+    }
+
+    public PriceRequest getPriceRequestById(int id) {
+        return priceRequestRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Price request not found"));
+    }
+
+    // Get all replies for a specific price request
+    public List<PriceRequestReply> getRepliesByPriceRequestId(int priceRequestId) {
+        return priceRequestReplyRepo.findByPriceRequestId(priceRequestId);
+    }
+    
+    // Get completed price requests
+    public List<PriceRequest> getCompletedPriceRequests() {
+        return priceRequestRepo.findAll().stream()
+                .filter(pr -> "Completed".equalsIgnoreCase(pr.getRequeststatus()))
+                .collect(Collectors.toList());
+    }
+
+    // Purchase Order Methods
+    public String addPurchaseOrder(com.example.thisaraprinters.dto.PurchaseOrderDto dto) {
+        try {
+            com.example.thisaraprinters.model.PurchaseOrder order = new com.example.thisaraprinters.model.PurchaseOrder();
+            order.setSupplier(supplierRepo.findById(dto.getSupplierId())
+                    .orElseThrow(() -> new RuntimeException("Supplier not found")));
+            
+            if (dto.getPriceRequestId() != null) {
+                order.setPriceRequest(priceRequestRepo.findById(dto.getPriceRequestId())
+                        .orElseThrow(() -> new RuntimeException("Price Request not found")));
+            }
+            
+            order.setOrderDate(dto.getOrderDate());
+            order.setItems(dto.getItems());
+            order.setQuantity(dto.getQuantity());
+            order.setPaymentStatus(dto.getPaymentStatus());
+            order.setNotes(dto.getNotes());
+            order.setCreatedDate(LocalDate.now());
+
+            purchaseOrderRepo.save(order);
+            return "Purchase Order created successfully";
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create Purchase Order: " + e.getMessage());
+        }
+    }
+
+    public List<com.example.thisaraprinters.model.PurchaseOrder> getAllPurchaseOrders() {
+        return purchaseOrderRepo.findAll();
+    }
+
+    public String deletePurchaseOrder(Integer id) {
+        try {
+            purchaseOrderRepo.deleteById(id);
+            return "Purchase Order deleted successfully";
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete Purchase Order: " + e.getMessage());
+        }
+    }
+
+    public String updatePaymentStatus(Integer orderId, String paymentStatus, String paymentProofFileName, String paymentNotes) {
+        try {
+            com.example.thisaraprinters.model.PurchaseOrder order = purchaseOrderRepo.findById(orderId)
+                    .orElseThrow(() -> new RuntimeException("Purchase Order not found"));
+            
+            order.setPaymentStatus(paymentStatus);
+            if (paymentProofFileName != null && !paymentProofFileName.isEmpty()) {
+                order.setPaymentProof(paymentProofFileName);
+            }
+            if (paymentNotes != null && !paymentNotes.isEmpty()) {
+                order.setNotes(paymentNotes);
+            }
+            
+            purchaseOrderRepo.save(order);
+            return "Payment status updated successfully";
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update payment status: " + e.getMessage());
+        }
+    }
+}
+

@@ -1,4 +1,4 @@
-const inputs = document.querySelectorAll(".validetion");
+const inputs = document.querySelectorAll("#employeeFormData .form-control, #employeeFormData .form-select, #employeeFormData .form-check-input");
 let employee = [];
 let isUpdate = false;
 isView = false;
@@ -7,7 +7,7 @@ isView = false;
 inputs.forEach(input => {
     input.addEventListener("blur", function () {
         // Find the error message element that belongs to this specific input
-        const errorMsg = input.parentElement.querySelector(".errorMessage");
+        const errorMsg = input.parentElement.querySelector(".errorMessage") || input.closest(".mb-3")?.querySelector(".errorMessage");
 
         if (input.value.trim() === "") {
             if (errorMsg) errorMsg.textContent = "Input field can't be empty";
@@ -25,15 +25,15 @@ function validateNIC() {
     const nicRegex = /^\d{12}$/;
     const oldNicRegex = /^\d{9}[vV]$/;
     const nic = employeeNic.value.trim();
-    const errorMessage = employeeNic.parentElement.querySelector(".errorMessage");
+    const errorMessage = employeeNic.parentElement.querySelector(".errorMessage") || employeeNic.closest(".mb-3")?.querySelector(".errorMessage");
 
     if (nic === "") return;
 
     if (!nicRegex.test(nic) && !oldNicRegex.test(nic)) {
-        errorMessage.textContent = "Invalid NIC format. Please enter 9 digits with V/X or 12 digits.";
+        if (errorMessage) errorMessage.textContent = "Invalid NIC format. Please enter 9 digits with V/X or 12 digits.";
         employeeNic.classList.add("input-error");
     } else {
-        errorMessage.textContent = "";
+        if (errorMessage) errorMessage.textContent = "";
         employeeNic.classList.remove("input-error");
     }
     setBirthDay();
@@ -57,15 +57,17 @@ function setBirthDay() {
     }
 
     // check for female brithday
+    let isFemale = false;
     if (dayValue > 500) {
         dayValue = dayValue - 500;
+        isFemale = true;
     }
 
-    // Calculate the date from the year and day of the year
-    let date = new Date(year, 0, 1);
-    date.setDate(dayValue);
+    // Calculate the month and date from dayValue using a leap year (e.g. 2004)
+    // to ensure Sri Lankan NIC day counting (which always assumes 366 days/year) is accurate.
+    let date = new Date(2004, 0, dayValue);
 
-    const yyyy = date.getFullYear();
+    const yyyy = year;
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
 
@@ -74,37 +76,49 @@ function setBirthDay() {
     if (setDob) {
         setDob.value = formattedDateForInput;
     }
+
+    // Automatically check the correct gender radio button
+    const radioMale = document.getElementById("radioMale");
+    const radioFemale = document.getElementById("radioFemale");
+    if (isFemale) {
+        if (radioFemale) radioFemale.checked = true;
+    } else {
+        if (radioMale) radioMale.checked = true;
+    }
 }
 
 //validetion for email
 const validateEmail = () => {
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    const email = document.getElementById("employeeEmail").value.trim();
-    const errorMessage = document.getElementById("employeeEmail").parentElement.querySelector(".errorMessage");
+    const emailField = document.getElementById("employeeEmail");
+    if (!emailField) return;
+    const email = emailField.value.trim();
+    const errorMessage = emailField.parentElement.querySelector(".errorMessage") || emailField.closest(".mb-3")?.querySelector(".errorMessage");
     if (email === "") return;
     if (!emailRegex.test(email)) {
-        errorMessage.textContent = "Invalid email format. Please enter a valid email address.";
-        document.getElementById("employeeEmail").classList.add("input-error");
+        if (errorMessage) errorMessage.textContent = "Invalid email format. Please enter a valid email address.";
+        emailField.classList.add("input-error");
     } else {
-        errorMessage.textContent = "";
-        document.getElementById("employeeEmail").classList.remove("input-error");
+        if (errorMessage) errorMessage.textContent = "";
+        emailField.classList.remove("input-error");
     }
 }
 
 //validate mobile no
 const validateMobileNo = () => {
     const mobileNoRegex = /^[0-9]{10}$/;
-    const mobileNo = document.getElementById("employeePhone").value.trim();
-    const errorMsg = document.getElementById("employeePhone").parentElement.querySelector(".errorMessage");
+    const phoneField = document.getElementById("employeePhone");
+    if (!phoneField) return;
+    const mobileNo = phoneField.value.trim();
+    const errorMsg = phoneField.parentElement.querySelector(".errorMessage") || phoneField.closest(".mb-3")?.querySelector(".errorMessage");
     if (mobileNo === "") return;
     if (!mobileNoRegex.test(mobileNo)) {
-        errorMsg.textContent = "Invalid mobile number format. Please enter 10 digits.";
-        document.getElementById("employeePhone").classList.add("input-error");
+        if (errorMsg) errorMsg.textContent = "Invalid mobile number format. Please enter 10 digits.";
+        phoneField.classList.add("input-error");
     } else {
-        errorMsg.textContent = "";
-        document.getElementById("employeePhone").classList.remove("input-error");
+        if (errorMsg) errorMsg.textContent = "";
+        phoneField.classList.remove("input-error");
     }
-
 }
 
 //set calling name
@@ -161,15 +175,12 @@ const populateEmployeeTable = (data = employee) => {
             <td onclick="viewEmployee(${emp.id})">${emp.fullname}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.callingname}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.nic}</td>
-            <td onclick="viewEmployee(${emp.id})">${emp.dob}</td>
-            <td onclick="viewEmployee(${emp.id})">${emp.gender}</td>
+            <td onclick="viewEmployee(${emp.id})">${emp.designationid.designation}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.email}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.phonenumber}</td>
-            <td onclick="viewEmployee(${emp.id})">${emp.address}</td>
-            <td onclick="viewEmployee(${emp.id})">${emp.position}</td>
             <td class="d-flex flex-row">
-                <button class="btn btn-teal px-3 py-2 ms-2"  onclick="updateEmployee(${emp.id})">Edit</button>
-                <button class="btn btn-red px-3 py-2 ms-2" onclick="deleteEmployee(${emp.id})">Delete</button>
+                <button class="btn btn-teal px-3 py-2 ms-2 viewform"  onclick="updateEmployee(${emp.id})">Edit</button>
+                <button class="btn btn-red px-3 py-2 ms-2 viewform" onclick="deleteEmployee(${emp.id})">Delete</button>
             </td>
         `;
         employeeTableBody.appendChild(row);
@@ -179,12 +190,25 @@ const populateEmployeeTable = (data = employee) => {
 //update employee
 const updateEmployee = (id) => {
     console.log(id);
-
     isUpdate = true;
-    document.getElementById("submitButton").textContent = "Update Employee";
-    document.querySelector(".modal-title").textContent = "Update Employee";
+    isView = false;
+    const submitBtn = document.getElementById("submitButton");
+    const clearBtn = document.getElementById("clearButton");
+    if (submitBtn) submitBtn.textContent = "Update Employee";
+    const modalTitle = document.querySelector(".modal-title");
+    if (modalTitle) modalTitle.textContent = "Update Employee";
+
+    // Reset readOnly on all inputs (in case view mode was previously opened)
+    document.querySelectorAll("#employeeFormData .form-control, #employeeFormData .form-select, #employeeFormData .form-check-input").forEach(input => {
+        input.readOnly = false;
+        input.disabled = false;
+    });
+    const jobSelect = document.getElementById("jobposition");
+    if (jobSelect) jobSelect.disabled = false;
 
     //open employee form model
+    if (submitBtn) submitBtn.classList.remove("d-none");
+    if (clearBtn) clearBtn.classList.remove("d-none");
     const modal = new bootstrap.Modal(document.getElementById("employeeModal"));
     modal.show();
 
@@ -196,26 +220,84 @@ const updateEmployee = (id) => {
     document.getElementById("employeeDOB").value = emp.dob;
     document.getElementById("employeeEmail").value = emp.email;
     document.getElementById("employeePhone").value = emp.phonenumber;
+    document.getElementById("emgpersonname").value = emp.emgpersonname || "";
+    document.getElementById("emgpersonphonenumber").value = emp.emgpersonphonenumber || "";
     document.querySelector(`input[name="gender"][value="${emp.gender}"]`).checked = true;
     document.querySelector(`textarea[name='address']`).value = emp.address;
-    document.querySelector(`select[name="position"] option[value="${emp.position}"]`).selected = true;
-    // Store the employee data 
-    document.getElementById("employeeFormData").dataset.employeeId = id;
+    document.querySelector(`select[name="designationid"] option[value="${emp.designationid.id}"]`).selected = true;
+    // Store the employee data
+    document.getElementById("employeeFormData").dataset.id = id;
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
 
+    imagePreview.src = `data:image/jpeg;base64,${emp.image}`;
+    imagePreview.classList.remove('d-none');
+    uploadPrompt.classList.remove('d-none');
+}
 
+const validateEmptyFormData = () => {
+    let isValid = true;
+    const inputs = document.querySelectorAll("#employeeFormData .form-control, #employeeFormData .form-select");
+    inputs.forEach(input => {
+        if (input.value.trim() === "") {
+            const errorMsg = input.parentElement.querySelector(".errorMessage") || input.closest(".mb-3")?.querySelector(".errorMessage");
+            if (errorMsg) errorMsg.textContent = "Input field can't be empty";
+            input.classList.add("input-error");
+            isValid = false;
+        }
+    });
+    return isValid;
+};
+
+document.getElementById("uploadArea").addEventListener("click",function () {
+    document.getElementById("imageInput").click();
+    
+});
+
+function previewImage(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const imagePreview = document.getElementById('imagePreview');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+
+            imagePreview.src = e.target.result;
+            imagePreview.classList.remove('d-none');
+            uploadPrompt.classList.add('d-none');
+        }
+        reader.readAsDataURL(file);
+    }
+    
 }
 
 
 const employeeFormDataListener = (event) => {
     event.preventDefault();
-    const formData = new FormData(employeeFormData);
-    console.log("Form data collected:", Object.fromEntries(formData.entries()));
-    const employeeId = document.getElementById("employeeFormData").dataset.employeeId;
 
+   const imageFile = document.getElementById("imageInput").files[0];
+   const imageSize = imageFile.size;
+   console.log("image siz"+" "+ imageSize/1024/1024+" MB");
+   
+    if (!validateEmptyFormData()) {
+        return;
+    }
+   
+    const formData = new FormData(employeeFormData);
+    //const convertToJSON = Object.fromEntries(formData.entries());
+   // console.log("Form data collected:", convertToJSON);
+    const employeeId = document.getElementById("employeeFormData").dataset.id;
+
+    if(imageFile){
+        // Do not append manually, FormData already includes it if the input is in the form
+        // formData.append("image",imageFile);
+    }
     // Store isUpdate before resetting it
     const shouldUpdate = isUpdate;
 
     isUpdate = false;
+    isView = false;
     document.getElementById("submitButton").textContent = "Add Employee";
     document.querySelector(".modal-title").textContent = "Add Employee";
 
@@ -224,22 +306,18 @@ const employeeFormDataListener = (event) => {
 
     }
 
-
-
     const url = shouldUpdate ? `/employees/update/${employeeId}` : "/employees/add/employee";
-    const method = shouldUpdate ? "PUT" : "POST";
-
+    const method = "POST";
 
     $.ajax({
         url: url,
-        type: method,
-        data: new URLSearchParams(formData),
-        contentType: "application/x-www-form-urlencoded",
-        dataType: "json",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData:false,
         async: false,
     })
         .done(function (data, jqXHR) {
-
             swal.fire({
                 title: "Success",
                 text: shouldUpdate ? "Employee updated successfully!" : "Employee added successfully!",
@@ -251,13 +329,7 @@ const employeeFormDataListener = (event) => {
                 refreshEmployeeData();
                 window.location.href = "/employees/getemployees";
                 $('#employeeModal').modal('hide');
-
-
             });
-
-
-
-
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
             console.error(shouldUpdate ? "Error updating employee:" : "Error adding employee:", textStatus, errorThrown);
@@ -265,24 +337,23 @@ const employeeFormDataListener = (event) => {
             console.error("Status code:", jqXHR.status);
             swal.fire({
                 title: "Error",
-                text: shouldUpdate ? "Failed to update employee. Please try again." : "Failed to add employee. Please try again.",
+                text: shouldUpdate ? "Failed to update employee. Please try again." : "Failed to add employee. Please try again." + jqXHR.responseText + textStatus + errorThrown,
                 icon: "error",
                 confirmButtonText: "OK"
             });
-
 
         })
         .always(function () {
             console.log("Request complete");
         });
 
-    $("#employeeModel").reset();
+    document.getElementById("employeeFormData").reset();
 };
 
 
 //employeeFormData.addEventListener("submit", employeeFormDataListener);
 
-// search employee 
+// search employee
 
 const searchEmployees = () => {
     const searchValue = document.getElementById("searchEmployee").value.trim().toLowerCase();
@@ -290,35 +361,68 @@ const searchEmployees = () => {
     const filterEmployee = employee.filter(emp => emp.fullname.toLowerCase().includes(searchValue) ||
         emp.callingname.toLowerCase().includes(searchValue) ||
         emp.nic.toLowerCase().includes(searchValue) ||
-        emp.email.toLowerCase().includes(searchValue) ||
-        emp.position.toLowerCase().includes(searchValue));
+        emp.email.toLowerCase().includes(searchValue));
     populateEmployeeTable(filterEmployee);
 }
 const resetForm = () => {
-    document.getElementById("employeeFormData").reset();
+    if (document.activeElement) {
+        document.activeElement.blur();
+    }
+
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+
+    imagePreview.src = "";
+    imagePreview.classList.add('d-none');
+    uploadPrompt.classList.remove('d-none');
+
+    const form = document.getElementById("employeeFormData");
+    if (form) form.reset();
     isUpdate = false;
     isView = false;
-    document.getElementById("submitButton").textContent = "Add Employee";
-    document.getElementById("submitButton").style.display = "block";
-    document.querySelector(".modal-title").textContent = "Add Employee";
     
+    const submitBtn = document.getElementById("submitButton");
+    const clearBtn = document.getElementById("clearButton");
+    if (submitBtn) {
+        submitBtn.textContent = "Add Employee";
+        submitBtn.style.display = "block";
+        submitBtn.classList.remove("d-none");
+    }
+    if (clearBtn) clearBtn.classList.remove("d-none");
+    const modalTitle = document.querySelector(".modal-title");
+    if (modalTitle) modalTitle.textContent = "Add Employee";
+
     // Make all inputs editable again
-    const inputs = document.querySelectorAll(".validetion");
+    const inputs = document.querySelectorAll("#employeeFormData .form-control, #employeeFormData .form-select, #employeeFormData .form-check-input");
     inputs.forEach(input => {
         input.readOnly = false;
+        input.disabled = false;
     });
+    // Re-enable select
+    const jobSelect = document.getElementById("jobposition");
+    if (jobSelect) jobSelect.disabled = false;
 }
 
 const viewEmployee = (id) => {
 
     isView = true;
-    document.getElementById("submitButton").style.display = "none";
-    document.querySelector(".modal-title").textContent = "Employee Details";
+    isUpdate = false;
+    const modalTitle = document.querySelector(".modal-title");
+    if (modalTitle) modalTitle.textContent = "Employee Details";
+    const submitBtn = document.getElementById("submitButton");
+    const clearBtn = document.getElementById("clearButton");
+    if (submitBtn) submitBtn.classList.add("d-none");
+    if (clearBtn) clearBtn.classList.add("d-none");
+
 
     //make inputs readonly
-    const inputs = document.querySelectorAll(".validetion");
+    const inputs = document.querySelectorAll("#employeeFormData .form-control, #employeeFormData .form-select, #employeeFormData .form-check-input ");
     inputs.forEach(input => {
-        input.readOnly = true;
+        if (input.type === 'radio' || input.tagName === 'SELECT') {
+            input.disabled = true;
+        } else {
+            input.readOnly = true;
+        }
     });
 
     //open employee form model
@@ -327,20 +431,25 @@ const viewEmployee = (id) => {
 
     //set employee data to the form
     const emp = employee.find(e => e.id === id);
+    console.log(emp.image);
     document.getElementById("employeeFullName").value = emp.fullname;
     document.getElementById("employeeName").value = emp.callingname;
     document.getElementById("employeeNIC").value = emp.nic;
     document.getElementById("employeeDOB").value = emp.dob;
     document.getElementById("employeeEmail").value = emp.email;
     document.getElementById("employeePhone").value = emp.phonenumber;
+    document.getElementById("emgpersonname").value = emp.emgpersonname || "";
+    document.getElementById("emgpersonphonenumber").value = emp.emgpersonphonenumber || "";
     document.querySelector(`input[name="gender"][value="${emp.gender}"]`).checked = true;
     document.querySelector(`textarea[name='address']`).value = emp.address;
-    document.querySelector(`select[name="position"] option[value="${emp.position}"]`).selected = true;
+    document.querySelector(`select[name="designationid"] option[value="${emp.designationid.id}"]`).selected = true;
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
 
-
-
+    imagePreview.src = `data:image/jpeg;base64,${emp.image}`;
+    imagePreview.classList.remove('d-none');
+    uploadPrompt.classList.add('d-none');
 }
-
 
 const deleteEmployee = (id) => {
     swal.fire({

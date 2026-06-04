@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Management</title>
     <!-- link bootstrap -->
-    <link rel="stylesheet" th:href="@{/css/bootstrap-5.3.7-dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" href="../resource/bootstrap-5.3.7-dist/css/bootstrap.min.css">
     <!-- link css -->
-    <link rel="stylesheet" th:href="@{/css/order.css}">
+    <link rel="stylesheet" href="./resources/order.css">
 
 </head>
 
@@ -29,38 +29,38 @@
                 <span class="ms-2">Order Management</span>
             </h2>
 
-            <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#generateQuotationModal">Generate
-                Quotation</button>
+            <button class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#generateQuatationModal">Generate
+                Quatation</button>
 
         </div>
     </div>
 
     <div class="container-fluid">
 
-        <!-- tab area for quotation and order -->
+        <!-- tab area for quatation and order -->
 
         <div class="tab-container">
             <div class="tab-header">
-                <button class="tab-btn active" onclick="openTab(event, 'quotation')">Quotation</button>
+                <button class="tab-btn active" onclick="openTab(event, 'quatation')">Quatation</button>
                 <button class="tab-btn" onclick="openTab(event, 'order')">Order</button>
             </div>
 
-            <div id="quotation" class="tab-content" style="display: block;">
-                <h3>Quotation</h3>
-                <!-- quotation table -->
+            <div id="quatation" class="tab-content" style="display: block;">
+                <h3>Quatation</h3>
+                <!-- quatation table -->
 
 
                 <table class="tablestyle">
                     <thead class="">
                         <tr>
-                            <th>Quotation ID</th>
+                            <th>Quatation ID</th>
                             <th>Customer Name</th>
-                            <th>Quotation Date</th>
-                            <th>Quotation Status</th>
-                            <th>Quotation Amount</th>
-                            <th>Quotation Validity</th>
-                            <th>Quotation Description</th>
-                            <th>Quotation Actions</th>
+                            <th>Quatation Date</th>
+                            <th>Quatation Status</th>
+                            <th>Quatation Amount</th>
+                            <th>Quatation Validity</th>
+                            <th>Quatation Description</th>
+                            <th>Quatation Actions</th>
 
                         </tr>
                     </thead>
@@ -89,14 +89,14 @@
 
             <div id="order" class="tab-content">
                 <h3>Data Table</h3>
-                <!-- quotation table -->
+                <!-- quatation table -->
 
 
                 <table class="tablestyle">
                     <thead class="">
                         <tr>
                             <th>Order ID</th>
-                            <th>Quotation Id</th>
+                            <th>Quatation Id</th>
                             <th>Customer Name</th>
                             <th>Job Status</th>
                             <th>Priority</th>
@@ -133,10 +133,12 @@
         </div>
     </div>
 
-    <!-- quotation modal -->
+    </div>
+
+    <!-- quatation model -->
 
 
-    <div class="modal fade " id="generateQuotationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    <div class="modal fade " id="generateQuatationModal" tabindex="-1" aria-labelledby="exampleModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl empModal">
             <div class="modal-content p-4 shadow-lg rounded-4">
@@ -336,58 +338,60 @@
                 </div>
             </div>
         </div>
-    </div>
 
 
 
 
-    <!-- search client Model -->
-    <div class="modal fade" id="searchCustomerModal" tabindex="-1" aria-labelledby="searchCustomerModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <!-- search client Model -->
+        <div class="modal fade" id="searchCustomerModal" tabindex="-1" aria-labelledby="searchCustomerModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
 
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Search Client</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Search Client</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            onclick="closeSearchModel(event, 'searchCustomerModal')"></button>
+                    </div>
 
-                <!-- Modal body -->
-                <div class="modal-body">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="searchClientName" class="form-label">Client Name</label>
-                                <input type="text" id="searchClientName" class="form-control" onkeyup="searchClient()">
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label for="clientName" class="form-label">Client Name</label>
+                                    <input type="text" id="searchClientName" class="form-control" id="clientName"
+                                        onkeyup="searchClient()">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="showSearchedClient " id="showSearchedClient" onclick="selectedClient()">
+
+                                </div>
                             </div>
                         </div>
-                        <div class="row mt-3">
-                            <div class="showSearchedClient " id="showSearchedClient" onclick="selectedClient()">
-                                <!-- Search results will appear here -->
-                            </div>
-                        </div>
+
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                            onclick="closeSearchModel(event, 'searchCustomerModal')">Close</button>
                     </div>
 
                 </div>
-
-                <!-- Modal footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                </div>
-
             </div>
         </div>
-    </div>
 
 
 
-    <!-- link js bootstrap -->
-    <script th:src="@{/css/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js}"></script>
-    <!-- link js -->
-    <script th:src="@{/js/order.js}"></script>
+        <!-- link js bootstrap -->
+        <script src="../resource/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
+        <!-- link js -->
+        <script src="./resources/order.js"></script>
 
 
 </body>
 
-</html>
+</html>

@@ -5,9 +5,8 @@ import com.example.thisaraprinters.model.EmployeeModel;
 import com.example.thisaraprinters.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -34,29 +33,28 @@ public class EmployeeController {
     }
 
     @PostMapping("/add/employee")
-    public ResponseEntity<?> addEmployee(@RequestBody EmployeeDto employee) {
+    public ResponseEntity<?> addEmployee(@ModelAttribute EmployeeDto employee, @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
-            employeeService.saveEmployee(employee);
+            System.out.println(employee.getFullname());
+            employeeService.saveEmployee(employee, image);
             return ResponseEntity.ok(Map.of("message", "successfully added the employee"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Error adding employee"));
+            return ResponseEntity.badRequest().body(Map.of("message", "Error adding employee: " + e.getMessage()));
         }
     }
 
     @GetMapping("/get/alldata")
     public ResponseEntity<?> getAllEmployees() {
-        try {
-            List employees = employeeService.getAllEmployees();
+        
+            List<EmployeeModel> employees = employeeService.getAllEmployees();
             return ResponseEntity.ok(employees);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Error getting employees"));
-        }
+       
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateEmployee(@PathVariable("id") Long id, @RequestBody EmployeeDto employee) {
+    @PostMapping("/update/{id}")
+    public ResponseEntity<?> updateEmployee(@PathVariable("id") Long id, @ModelAttribute EmployeeDto employee, @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
-            employeeService.updateEmployee(id, employee);
+            employeeService.updateEmployee(id, employee, image);
             return ResponseEntity.ok(Map.of("message", "successfully updated the employee"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", "Error updating employee"));

@@ -39,4 +39,5 @@ private Integer quotationvalidity;
 private LocalDate orderplaceddate;
 private LocalDate addeddate;
 
+
 }

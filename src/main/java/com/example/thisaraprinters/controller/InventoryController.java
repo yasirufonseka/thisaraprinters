@@ -1,5 +1,6 @@
 package com.example.thisaraprinters.controller;
 
+import com.example.thisaraprinters.dto.InventoryDto;
 import com.example.thisaraprinters.model.Inventory;
 import com.example.thisaraprinters.model.Materials;
 import com.example.thisaraprinters.service.InventoryService;
@@ -44,6 +45,7 @@ public class InventoryController {
         mav.addObject("materials", materialsService.getAllMaterials());
         mav.addObject("suppliers", supplierService.getAllSuppliers());
         mav.addObject("users", userService.getAllUsers());
+        mav.addObject("grns", inventoryService.getAllGRNs());
         return mav;
     }
 
@@ -128,7 +130,7 @@ public class InventoryController {
     // Receive goods with full Inventory record (GRN)
     @PostMapping("/api/grn/save-full")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> saveGRNFull(@RequestBody Inventory inventory) {
+    public ResponseEntity<Map<String, String>> saveGRNFull(@RequestBody InventoryDto inventory) {
         String result = inventoryService.saveGRN(inventory);
         int statusCode = result.contains("successfully") ? 200 : 400;
         return ResponseEntity.status(statusCode).body(Map.of("message", result));

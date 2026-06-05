@@ -6,20 +6,20 @@ import com.example.thisaraprinters.model.UserModel;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 public class InventoryDto {
 
-    private Integer id;
+
     private String grnNumber;
     private String supplierInvoiceNo;
     private String batchNo;
     private Integer recivedquantity;
     private String units;
     private LocalDate expiryDate;
+    private LocalDate receivedDate;
     private String notes;
-    private List<Materials> itemname;
+    private Materials itemname;
     private Supplier suppliers;
     private UserModel receivedByUser;
 }

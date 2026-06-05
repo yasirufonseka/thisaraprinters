@@ -9,11 +9,12 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/order")
 public class OrderController {
 
-    @GetMapping("/getorderview")
+    @GetMapping("/management")
     public ModelAndView getOrderView() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("ordermanagement");
         return mav;
     }
+
 
 }

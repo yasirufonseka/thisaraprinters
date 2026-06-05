@@ -229,12 +229,18 @@ public class SupplierService {
         }
     }
 
-    public String updatePaymentStatus(Integer orderId, String paymentStatus, String paymentProofFileName, String paymentNotes) {
+    public String updatePaymentStatus(Integer orderId, String paymentStatus, String paymentMethod, Double paidAmount, String paymentProofFileName, String paymentNotes) {
         try {
             com.example.thisaraprinters.model.PurchaseOrder order = purchaseOrderRepo.findById(orderId)
                     .orElseThrow(() -> new RuntimeException("Purchase Order not found"));
             
             order.setPaymentStatus(paymentStatus);
+            if (paymentMethod != null && !paymentMethod.isEmpty()) {
+                order.setPaymentMethod(paymentMethod);
+            }
+            if (paidAmount != null) {
+                order.setPaidAmount(paidAmount);
+            }
             if (paymentProofFileName != null && !paymentProofFileName.isEmpty()) {
                 order.setPaymentProof(paymentProofFileName);
             }

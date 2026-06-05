@@ -4,11 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Management</title>
+    <title>Supplier Management</title>
     <!-- link bootstrap -->
-    <link rel="stylesheet" href="../resource/bootstrap-5.3.7-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-5.3.7-dist/css/bootstrap.min.css}">
     <!-- link css -->
-    <link rel="stylesheet" href="./resources/order.css">
+    <link rel="stylesheet" th:href="@{/css/order.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/sweetalert2/sweetalert2.min.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 
 </head>
 
@@ -361,7 +364,7 @@
                             <div class="row">
                                 <div class="col-6">
                                     <label for="clientName" class="form-label">Client Name</label>
-                                    <input type="text" id="searchClientName" class="form-control" id="clientName"
+                                    <input type="text"  class="form-control" id="clientName"
                                         onkeyup="searchClient()">
                                 </div>
                             </div>
@@ -386,11 +389,11 @@
 
 
 
-        <!-- link js bootstrap -->
-        <script src="../resource/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"></script>
-        <!-- link js -->
-        <script src="./resources/order.js"></script>
+        <!-- link user js file -->
+        <script th:src="@{/js/order.js}"></script>
 
+        <!-- link js bootstrap -->
+        <script th:src="@{/css/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js}"></script>
 
 </body>
 

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management - PrintFlow Pro</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap-5.3.7-dist/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .tab-header {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .tab-btn.active {
+            color: var(--accent);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/layout :: sidebar('orders')}"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <div th:replace="~{fragments/layout :: topbar}"></div>
+
+            <div class="dashboard-page animate-fade-in">
+                <div class="page-header d-flex justify-content-between align-items-end">
+                    <div>
+                        <h1>Order & Quotation Management</h1>
+                        <p>Process customer inquiries and track production orders.</p>
+                    </div>
+                    <button class="btn btn-teal px-4 py-2" data-bs-toggle="modal" data-bs-target="#generateQuotationModal" style="border-radius: 10px; font-weight: 600;">
+                        + Generate Quotation
+                    </button>
+                </div>
+
+                <div class="main-card p-4 rounded-4 shadow-lg">
+                    <div class="tab-header">
+                        <button class="tab-btn active" onclick="openTab(event, 'quotationView')">Quotations</button>
+                        <button class="tab-btn" onclick="openTab(event, 'orderView')">Orders</button>
+                    </div>
+
+                    <!-- Quotation Tab -->
+                    <div id="quotationView" class="tab-content" style="display: block;">
+                        <div class="table-responsive">
+                            <table class="orderTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Q2026-001</td>
+                                        <td>ABC Corporation</td>
+                                        <td>2026-04-26</td>
+                                        <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                        <td>Rs. 25,000.00</td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-sm btn-outline-info">Edit</button>
+                                                <button class="btn btn-sm btn-outline-success">Send to Production</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Order Tab -->
+                    <div id="orderView" class="tab-content" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="orderTable">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Job Status</th>
+                                        <th>Priority</th>
+                                        <th>Deadline</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ORD-1042</td>
+                                        <td>John Smith</td>
+                                        <td><span class="badge bg-info text-dark">Design</span></td>
+                                        <td>
+                                            <select class="form-select form-select-sm" style="width: auto;">
+                                                <option>Normal</option>
+                                                <option>Urgent</option>
+                                            </select>
+                                        </td>
+                                        <td>2026-05-02</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-info">View Details</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Quotation Modal -->
+    <div class="modal fade" id="generateQuotationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate New Quotation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Customer Name</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="customerName" placeholder="Search or select customer">
+                                <button class="btn btn-teal" type="button" onclick="openClientSearch(event,'searchCustomerModal')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor">
+                                        <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Product Size</label>
+                            <select class="form-select">
+                                <option>A4 (8.27" x 11.69")</option>
+                                <option>A3 (11.69" x 16.54")</option>
+                                <option>Business Card</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" class="form-control" placeholder="0">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Color Type</label>
+                            <select class="form-select">
+                                <option>Full Color (CMYK)</option>
+                                <option>Black & White</option>
+                                <option>Spot Color</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Lamination</label>
+                            <select class="form-select">
+                                <option>None</option>
+                                <option>Gloss</option>
+                                <option>Matte</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Additional Instructions</label>
+                            <textarea class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer mt-4 px-0 pb-0">
+                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-teal px-5">Generate & Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Search Modal -->
+    <div class="modal fade" id="searchCustomerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Search Client</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <input type="text" id="searchClientName" class="form-control mb-3" placeholder="Type client name..." onkeyup="searchClient()">
+                    <div id="showSearchedClient" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Results -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/jquery-4.0.0.min.js}"></script>
+    <script th:src="@{/css/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/order.js}"></script>
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+    </script>
+</body>
+
+</html>

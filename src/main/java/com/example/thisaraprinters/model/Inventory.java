@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -34,6 +32,9 @@ public class Inventory {
     
     @Column(name = "expirydate")
     private LocalDate expiryDate;
+
+    @Column(name = "receiveddate")
+    private LocalDate receivedDate;
     
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
@@ -41,10 +42,10 @@ public class Inventory {
     @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id")
-    private List<Materials> itemname;
+    private Materials itemname;
     
     @JoinColumn(name = "supplier_id",referencedColumnName = "id")
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Supplier suppliers;
     
     @ManyToOne(fetch = FetchType.LAZY)

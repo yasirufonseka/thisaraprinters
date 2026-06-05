@@ -148,6 +148,8 @@ public class SupplierController {
     public ResponseEntity<Map<String, String>> updatePaymentStatus(
             @PathVariable("id") Integer orderId,
             @RequestParam("paymentStatus") String paymentStatus,
+            @RequestParam(value = "paymentMethod", required = false) String paymentMethod,
+            @RequestParam(value = "paidAmount", required = false) Double paidAmount,
             @RequestParam(value = "paymentProof", required = false) MultipartFile paymentProof,
             @RequestParam(value = "paymentNotes", required = false) String paymentNotes) {
         try {
@@ -176,7 +178,7 @@ public class SupplierController {
             }
             
             return ResponseEntity.status(200).body(Map.of("message", 
-                    supplierService.updatePaymentStatus(orderId, paymentStatus, paymentProofFileName, paymentNotes)));
+                    supplierService.updatePaymentStatus(orderId, paymentStatus, paymentMethod, paidAmount, paymentProofFileName, paymentNotes)));
         } catch (IOException e) {
             return ResponseEntity.status(500).body(Map.of("message", "Failed to save payment proof: " + e.getMessage()));
         } catch (Exception e) {

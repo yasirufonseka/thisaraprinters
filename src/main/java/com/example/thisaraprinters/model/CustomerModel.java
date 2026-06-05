@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Entity
@@ -14,7 +15,7 @@ public class CustomerModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private int id;
     
     @NotNull
     @Column(name = "name")
@@ -42,5 +43,8 @@ public class CustomerModel {
     
     @Column(name = "updateddate")
     private LocalDate updateddate;
+
+    @OneToMany(mappedBy = "customer")
+    private List<QuotationModel> quotations;
 
 }

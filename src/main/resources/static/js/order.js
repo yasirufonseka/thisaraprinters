@@ -64,14 +64,14 @@ const closeSearchModel = (event, modelId) => {
 
 //search client from the client database
 function searchClient() {
-  const searchClientsName = document.getElementById('searchClientName').value;
+  const searchClientsName = document.getElementById('clientName').value.trim();
   // console.log(searchClientsName);
 
   const showSearchedClientDiv = document.getElementById('showSearchedClient');
 
   // filter sample data
-  const findClient = sampleClients.find(client => client.name.toLocaleLowerCase().includes(searchClientsName.toLocaleLowerCase()));
-  // console.log(findClient);
+  const findClient = globalCustomer.find(cus =>cus.name === searchClientsName)
+  console.log(findClient);
 
   if (findClient) {
     // Store the full client object in the dataset for retrieval

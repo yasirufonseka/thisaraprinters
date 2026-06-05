@@ -35,4 +35,9 @@ public class Materials {
     @ManyToMany(mappedBy = "materials")
     private List<Supplier> supplires = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "materialsList")
+    private List<QuotationModel> quotations = new ArrayList<>();
+
+
+
 }

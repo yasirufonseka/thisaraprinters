@@ -1,3 +1,22 @@
+let materialList = [];
+
+// Show / hide the custom size height & width fields based on dropdown selection
+function toggleCustomSize() {
+  const select = document.getElementById('productSize');
+  const wrap   = document.getElementById('customSizeWrap');
+  if (!select || !wrap) return;
+
+  if (select.value === 'custom') {
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+    const heightInput = document.getElementById('customSizeHeight');
+    const widthInput  = document.getElementById('customSizeWidth');
+    if (heightInput) heightInput.value = '';
+    if (widthInput)  widthInput.value  = '';
+  }
+}
+
 //add tabs like structure for quatation and order
 function openTab(evt, tabName) {
   // hide all content boxes
@@ -31,12 +50,6 @@ function toggleDeliveryFields() {
   });
 }
 
-//sample data
-const sampleClients = [
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-  { id: 3, name: 'Alice Johnson', email: 'alice@example.com' },
-];
 
 //open customer search model
 const openClientSearch = (event, modalId) => {
@@ -64,38 +77,42 @@ const closeSearchModel = (event, modelId) => {
 
 //search client from the client database
 function searchClient() {
+
+  const globalCustomerList = window.globalCustomer; //
   const searchClientsName = document.getElementById('clientName').value.trim();
   // console.log(searchClientsName);
 
   const showSearchedClientDiv = document.getElementById('showSearchedClient');
 
   // filter sample data
-  const findClient = globalCustomer.find(cus =>cus.name === searchClientsName)
+  const findClient = globalCustomerList.filter(cus =>cus.name.toLowerCase().includes(searchClientsName.toLowerCase()) )
   console.log(findClient);
 
-  if (findClient) {
-    // Store the full client object in the dataset for retrieval
-    showSearchedClientDiv.dataset.client = JSON.stringify(findClient);
+  if (findClient.length >0) {
+    showSearchedClientDiv.dataset.client = JSON.stringify(findClient[0]);
 
-    //show searched client on a div
-    showSearchedClientDiv.innerHTML = `
+    // Store the full client object in the dataset for retrieval
+    showSearchedClientDiv.innerHTML = findClient.map(client=>`
+
     <div class="col-md-12">
       <div class="card" style="cursor: pointer;">
         <div class="card-body">
-          <h3 class="card-title">${findClient.name}</h3>
-          <p class="card-text">${findClient.email}</p>
+          <h3 class="card-title">${client.name}</h3>
+          <p class="card-text">${client.email}</p>
         </div>
       </div>
-    </div>
-    `;
+    </div>`).join("");
+
   } else {
     // Handle case where no client is found
     delete showSearchedClientDiv.dataset.client;
-    showSearchedClientDiv.innerHTML = '';
+    showSearchedClientDiv.innerHTML = '<p class="text-muted">No client found.</p>';
   }
+
 }
 
 function selectedClient() {
+  const model = document.getElementById('searchCustomerModal')
   //get the selected client from the showSearchedClient div
   const showSearchedClient = document.getElementById('showSearchedClient');
 
@@ -120,7 +137,7 @@ function selectedClient() {
     modal.setAttribute('tabindex', '0');
 
     //Using the existing close logic if accessible or bootstrap methods
-    bootstrap.Modal.getInstance(modal).hide();
+      bootstrap.Modal.getOrCreateInstance(modal).hide();
 
     
 
@@ -128,4 +145,83 @@ function selectedClient() {
   else {
     alert('Please select a client');
   }
-} 
+}
+
+function makeMaterialList(){
+  const select = document.getElementById('materials');
+  const selectedValue = select.value;
+  const selectedText = select.options[select.selectedIndex].text;
+  if (!selectedValue) return;
+
+  // Avoid duplicates
+  if(materialList.some(m => m.id === selectedValue)) return;
+
+  // Add to array with both id and name
+  materialList.push({ id: selectedValue, name: selectedText });
+  renderMaterialList();
+}
+
+function renderMaterialList() {
+  const div = document.getElementById('selectedMaterial');
+  div.innerHTML = materialList.map((m, index) => `
+        <div data-id="${m.id}">
+            ${m.name}
+            <span onclick="removeMaterial(${index})" style="cursor:pointer">✕</span>
+        </div>
+    `).join('');
+}
+
+function removeMaterial(index) {
+  materialList.splice(index, 1);
+  renderMaterialList();
+}
+
+// Show cost-per-sheet input when a radio group has a selection (e.g. Binding)
+function toggleCostInput(wrapId) {
+  const wrap = document.getElementById(wrapId);
+  if (wrap) {
+    wrap.style.display = 'block';
+  }
+}
+
+// Show cost-per-sheet input when at least one checkbox in a group is ticked (e.g. Cutting, Foiling)
+function toggleCostInputByCheckboxGroup(wrapId, checkboxIds) {
+  const anyChecked = checkboxIds.some(id => {
+    const el = document.getElementById(id);
+    return el && el.checked;
+  });
+  const wrap = document.getElementById(wrapId);
+  if (wrap) {
+    wrap.style.display = anyChecked ? 'block' : 'none';
+    if (!anyChecked) {
+      const input = wrap.querySelector('input[type="number"]');
+      if (input) input.value = '';
+    }
+  }
+}
+
+// Show the correct lamination cost input based on which radio group (Thermal vs Normal) is selected
+function toggleLaminationCost() {
+  const thermalSelected = document.getElementById('laminationThermalGloss').checked ||
+                          document.getElementById('laminationThermalMat').checked;
+  const normalSelected  = document.getElementById('laminationNormalGloss').checked ||
+                          document.getElementById('laminationNormalMat').checked;
+
+  const thermalWrap = document.getElementById('laminationThermalCostWrap');
+  const normalWrap  = document.getElementById('laminationNormalCostWrap');
+
+  if (thermalWrap) {
+    thermalWrap.style.display = thermalSelected ? 'block' : 'none';
+    if (!thermalSelected) {
+      const input = thermalWrap.querySelector('input[type="number"]');
+      if (input) input.value = '';
+    }
+  }
+  if (normalWrap) {
+    normalWrap.style.display = normalSelected ? 'block' : 'none';
+    if (!normalSelected) {
+      const input = normalWrap.querySelector('input[type="number"]');
+      if (input) input.value = '';
+    }
+  }
+}

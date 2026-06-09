@@ -27,8 +27,9 @@ public class OrderController {
     public ModelAndView getOrderView() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("ordermanagement");
-        mav.addObject("customerList",orderService.getAllCustomers());
         mav.addObject("materialList",orderService.getAllMaterials());
+        mav.addObject("customerList",orderService.getAllCustomers());
+      //  mav.addObject("materialList",orderService.getAllMaterials());
         return mav;
     }
 

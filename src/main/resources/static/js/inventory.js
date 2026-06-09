@@ -1,7 +1,7 @@
 // Add Material Form Submission
 function submitMaterial(event) {
     event.preventDefault();
-    
+
     const formData = {
         material: document.getElementById('materialName').value,
         availablequantity: parseInt(document.getElementById('materialQuantity').value),
@@ -11,7 +11,7 @@ function submitMaterial(event) {
     };
 
     const response = postHTTPService('/inventory/api/materials/add', 'POST', 'json', formData);
-    
+
     if (response.responseText && response.responseText.includes('Error')) {
         Swal.fire({
             icon: 'error',
@@ -39,7 +39,7 @@ function submitMaterial(event) {
 // Update Material
 function updateMaterial(materialId) {
     const response = getHTTPService('/inventory/api/materials/' + materialId, 'GET', 'json');
-    
+
     if (response.responseText && response.responseText.includes('Error')) {
         Swal.fire({
             icon: 'error',
@@ -50,7 +50,7 @@ function updateMaterial(materialId) {
     }
 
     const material = response.responseJSON;
-    
+
     // Populate form with existing data
     document.getElementById('materialName').value = material.material;
     document.getElementById('materialQuantity').value = material.availablequantity;
@@ -60,9 +60,9 @@ function updateMaterial(materialId) {
 
     // Change modal title and button text
     document.getElementById('addMaterialModalHeader').textContent = 'Edit Material';
-    document.getElementById('materialFormData').onsubmit = function(event) {
+    document.getElementById('materialFormData').onsubmit = function (event) {
         event.preventDefault();
-        
+
         const updatedData = {
             id: materialId,
             material: document.getElementById('materialName').value,
@@ -73,7 +73,7 @@ function updateMaterial(materialId) {
         };
 
         const updateResponse = postHTTPService('/inventory/api/materials/' + materialId, 'PUT', 'json', updatedData);
-        
+
         if (updateResponse.responseText && updateResponse.responseText.includes('Error')) {
             Swal.fire({
                 icon: 'error',
@@ -115,7 +115,7 @@ function deleteMaterial(materialId) {
     }).then((result) => {
         if (result.isConfirmed) {
             const response = getHTTPService('/inventory/api/materials/' + materialId, 'DELETE', 'json');
-            
+
             if (response.responseText && response.responseText.includes('Error')) {
                 Swal.fire({
                     icon: 'error',
@@ -141,7 +141,7 @@ function deleteMaterial(materialId) {
 // Submit GRN Form
 function submitGRN(event) {
     event.preventDefault();
-    
+
     const grnData = {
         supplierInvoiceNo: document.getElementById('grnSupplierInvoice').value,
         batchNo: document.getElementById('grnBatchNo').value,
@@ -159,7 +159,7 @@ function submitGRN(event) {
     const serverMessage = response.responseJSON && response.responseJSON.message
         ? response.responseJSON.message
         : 'Goods receipt note has been saved successfully.';
-    
+
     if (response.status >= 400 || (response.responseText && response.responseText.includes('Error'))) {
         Swal.fire({
             icon: 'error',
@@ -186,7 +186,7 @@ function submitGRN(event) {
 // Submit Usage Form
 function submitUsage(event) {
     event.preventDefault();
-    
+
     const usageData = {
         materialId: parseInt(document.getElementById('usageItem').value),
         quantityUsed: parseInt(document.getElementById('usageQty').value),
@@ -195,7 +195,7 @@ function submitUsage(event) {
     };
 
     const response = postHTTPService('/inventory/api/materials/usage', 'POST', 'json', usageData);
-    
+
     if (response.responseText && response.responseText.includes('Error')) {
         Swal.fire({
             icon: 'error',
@@ -220,38 +220,38 @@ function submitUsage(event) {
 }
 
 // Search functionality
-$(document).ready(function() {
-    $('#searchInventory').on('keyup', function() {
+$(document).ready(function () {
+    $('#searchInventory').on('keyup', function () {
         const searchTerm = $(this).val().toLowerCase();
-        
-        $('#materialTable tbody tr').filter(function() {
+
+        $('#materialTable tbody tr').filter(function () {
             $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
         });
     });
 
-    $('#searchGRN').on('keyup', function() {
+    $('#searchGRN').on('keyup', function () {
         const searchTerm = $(this).val().toLowerCase();
-        
-        $('#grnTable tbody tr').filter(function() {
+
+        $('#grnTable tbody tr').filter(function () {
             $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
         });
     });
 
     // Reset form when modal is closed
-    $('#addMaterialModal').on('hidden.bs.modal', function() {
+    $('#addMaterialModal').on('hidden.bs.modal', function () {
         document.getElementById('materialFormData').reset();
         document.getElementById('addMaterialModalHeader').textContent = 'Add Material';
         document.getElementById('materialFormData').onsubmit = submitMaterial;
     });
 
     // Reset GRN form when modal is closed
-    $('#grnModal').on('hidden.bs.modal', function() {
+    $('#grnModal').on('hidden.bs.modal', function () {
         document.getElementById('grnFormData').reset();
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('grnDate').value = today;
     });
 
-    $('#grnItem').on('change', function() {
+    $('#grnItem').on('change', function () {
         const selectedUnit = $(this).find(':selected').data('unit');
         if (selectedUnit) {
             $('#grnUnits').val(selectedUnit);
@@ -259,7 +259,7 @@ $(document).ready(function() {
     });
 
     // Reset Usage form when modal is closed
-    $('#usageModal').on('hidden.bs.modal', function() {
+    $('#usageModal').on('hidden.bs.modal', function () {
         document.getElementById('usageFormData').reset();
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('usageDate').value = today;

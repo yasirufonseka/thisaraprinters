@@ -38,21 +38,20 @@ public class OrderService {
             QuotationModel newQuotation = new QuotationModel();
 
             //set valus to the object from frontend
-            newQuotation.setProductsize(quotation.getProductsize());
+            newQuotation.setProductsize(quotation.getProductsize().toUpperCase());
             newQuotation.setQuantity(quotation.getQuantity());
             newQuotation.setColor(quotation.getColor());
             newQuotation.setCustomer(quotation.getCustomer());
-            newQuotation.setQuotationdescription(quotation.getQuotationdescription());
-            newQuotation.setCuttingtype(quotation.getCuttingtype());
+            newQuotation.setQuotationdescription(quotation.getQuotationdescription().toUpperCase());
+            newQuotation.setCuttingtype(quotation.getCuttingtype().toUpperCase());
             newQuotation.setFoiling(quotation.getFoiling());
             newQuotation.setLamination(quotation.getLamination());
-            newQuotation.setBindingtype(quotation.getBindingtype());
+            newQuotation.setBindingtype(quotation.getBindingtype().toUpperCase());
             newQuotation.setQuotationamount(quotation.getQuotationamount());
             newQuotation.setAdvanceamount(quotation.getAdvanceamount());
-            newQuotation.setQuotationstatus(quotation.getQuotationstatus());
+            newQuotation.setQuotationstatus(quotation.getQuotationstatus().toUpperCase());
             newQuotation.setQuotationdate(LocalDate.now());
             newQuotation.setExpiryDate(calculateExpiryDate());
-            newQuotation.setCustomer(quotation.getCustomer());
             newQuotation.setMaterialsList(quotation.getMaterialsList());
 
             quotationRepo.save(newQuotation);

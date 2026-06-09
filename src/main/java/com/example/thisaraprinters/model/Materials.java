@@ -18,15 +18,15 @@ public class Materials {
     private Integer id;
     @Column(name = "material")
     private String material;
-    @Column(name="availablequantity")
+    @Column(name = "availablequantity")
     private Integer availablequantity;
-    @Column(name="units")
+    @Column(name = "units")
     private String units;
-    @Column(name="reorderlevel")
+    @Column(name = "reorderlevel")
     private Integer reorderlevel;
-    @Column(name="status")
+    @Column(name = "status")
     private String status;
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category categoryid;
 
@@ -37,7 +37,5 @@ public class Materials {
 
     @ManyToMany(mappedBy = "materialsList")
     private List<QuotationModel> quotations = new ArrayList<>();
-
-
 
 }

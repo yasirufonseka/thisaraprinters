@@ -187,32 +187,65 @@
                         <!-- Product Specs -->
                         <div class="col-md-4">
                             <label for="productSize" class="form-label">Product Size</label>
-
-                            <select class="form-select" id="productSize">
+                            <select class="form-select" id="productSize" onchange="toggleCustomSize()">
                                 <option value="" selected>Select Size</option>
                                 <option value="A3">A3 (11.69" x 16.54")</option>
                                 <option value="A4">A4 (8.27" x 11.69")</option>
                                 <option value="A5">A5 (5.83" x 8.27")</option>
                                 <option value="Letter">Letter (8.5" x 11")</option>
                                 <option value="Legal">Legal (8.5" x 14")</option>
+                                <option value="custom">&#9998; Custom Size</option>
                             </select>
-
+                            <!-- Custom size dimension inputs -->
+                            <div id="customSizeWrap" style="display:none;" class="mt-2">
+                                <div class="d-flex gap-2 align-items-center">
+                                    <div class="flex-fill">
+                                        <input type="number" class="form-control form-control-sm" id="customSizeHeight"
+                                            placeholder="Height" min="0" step="0.01">
+                                        <div class="form-text text-muted" style="font-size:0.72rem;">Height (inches)</div>
+                                    </div>
+                                    <span class="text-muted fw-bold" style="margin-bottom:18px;">&#215;</span>
+                                    <div class="flex-fill">
+                                        <input type="number" class="form-control form-control-sm" id="customSizeWidth"
+                                            placeholder="Width" min="0" step="0.01">
+                                        <div class="form-text text-muted" style="font-size:0.72rem;">Width (inches)</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label for="quantity" class="form-label">Quantity</label>
-                            <input type="number" class="form-control" id="quantity" placeholder="0">
+                            <label class="form-label">Quantity &amp; Wastage</label>
+                            <div class="d-flex gap-2">
+                                <div class="flex-fill">
+                                    <input type="number" class="form-control" id="quantity" placeholder="Qty" min="0">
+                                    <div class="form-text text-muted" style="font-size:0.75rem;">Quantity</div>
+                                </div>
+                                <div class="flex-fill">
+                                    <input type="number" class="form-control" id="wastageSheets" placeholder="Wastage" min="0">
+                                    <div class="form-text text-muted" style="font-size:0.75rem;">Wastage (sheets)</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-4">
                             <label for="colorType" class="form-label">Color Type</label>
                             <select class="form-select" id="colorType">
-                                <option value="4-colours">4 Colours</option>
-                                <option value="2-colours">2 Colours</option>
+                                <option value="4">4 Colours</option>
+                                <option value="3">4 Colours</option>
+                                <option value="2">2 Colours</option>
+                                <option value="1">1 Colours</option>
                             </select>
                         </div>
 
                         <div class="col-12">
                             <label for="materials" class="form-label">Materials</label>
-                            <input type="text" class="form-control" id="materials" placeholder="Enter materials">
+                            <div class="d-flex gap-2 align-items-end">
+                                <select class="form-select flex-grow-1" id="materials">
+                                    <option th:each="material : ${materialList}" th:if="${material.categoryid.id == 1}" th:value="${material.id}" th:text="${material.material}"></option>
+                                </select>
+                                <!-- <button type="button" class="btn btn-teal" onclick="makeMaterialList()">Add</button>
+                            -->
+                            </div>
+                            <!-- <div class="block-list mt-2" id="selectedMaterial" ></div> -->
                         </div>
 
                         <!-- Finishing Options -->
@@ -220,57 +253,85 @@
                             <label class="form-label d-block fw-bold">Binding</label>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="binding" id="bindingPerfect"
-                                    value="perfect">
+                                    value="perfect" onchange="toggleCostInput('bindingCostWrap')">
                                 <label class="form-check-label" for="bindingPerfect">Perfect</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="binding" id="bindingSpiral"
-                                    value="spiral">
+                                    value="spiral" onchange="toggleCostInput('bindingCostWrap')">
                                 <label class="form-check-label" for="bindingSpiral">Spiral</label>
+                            </div>
+                            <div id="bindingCostWrap" class="cost-input-wrap mt-2" style="display:none;">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">Rs.</span>
+                                    <input type="number" class="form-control" id="bindingCostPerSheet" placeholder="Cost per sheet" min="0" step="0.01">
+                                </div>
+                                <div class="form-text text-muted" style="font-size:0.75rem;">Cost per sheet</div>
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label d-block fw-bold">Cutting</label>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="cuttingDie" value="die-cutting">
+                                <input class="form-check-input" type="checkbox" id="cuttingDie" value="die-cutting" onchange="toggleCostInputByCheckboxGroup('cuttingCostWrap', ['cuttingDie','cuttingGill'])">
                                 <label class="form-check-label" for="cuttingDie">Die Cutting</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="cuttingGill" value="gillnetting">
+                                <input class="form-check-input" type="checkbox" id="cuttingGill" value="gillnetting" onchange="toggleCostInputByCheckboxGroup('cuttingCostWrap', ['cuttingDie','cuttingGill'])">
                                 <label class="form-check-label" for="cuttingGill">Gillnetting</label>
+                            </div>
+                            <div id="cuttingCostWrap" class="cost-input-wrap mt-2" style="display:none;">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">Rs.</span>
+                                    <input type="number" class="form-control" id="cuttingCostPerSheet" placeholder="Cost per sheet" min="0" step="0.01">
+                                </div>
+                                <div class="form-text text-muted" style="font-size:0.75rem;">Cost per sheet</div>
                             </div>
                         </div>
 
                         <div class="col-md-4">
                             <label class="form-label d-block fw-bold">Foiling</label>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="foilingUv" value="uv-spot">
+                                <input class="form-check-input" type="checkbox" id="foilingUv" value="uv-spot" onchange="toggleCostInputByCheckboxGroup('foilingCostWrap', ['foilingUv','foilingNormal'])">
                                 <label class="form-check-label" for="foilingUv">UV Spot</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="checkbox" id="foilingNormal"
-                                    value="normal-foiling">
+                                    value="normal-foiling" onchange="toggleCostInputByCheckboxGroup('foilingCostWrap', ['foilingUv','foilingNormal'])">
                                 <label class="form-check-label" for="foilingNormal">Normal Foiling</label>
+                            </div>
+                            <div id="foilingCostWrap" class="cost-input-wrap mt-2" style="display:none;">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text">Rs.</span>
+                                    <input type="number" class="form-control" id="foilingCostPerSheet" placeholder="Cost per sheet" min="0" step="0.01">
+                                </div>
+                                <div class="form-text text-muted" style="font-size:0.75rem;">Cost per sheet</div>
                             </div>
                         </div>
 
                         <!-- Lamination -->
                         <div class="col-12 mt-3">
                             <label class="form-label fw-bold">Lamination</label>
-                            <div class="d-flex gap-4 flex-wrap">
+                            <div class="d-flex gap-4 flex-wrap align-items-start">
                                 <!-- Thermal Group -->
                                 <div class="border p-2 rounded">
                                     <span class="fw-semibold d-block mb-1">Thermal</span>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="lamination"
-                                            id="laminationThermalGloss" value="thermal-gloss">
+                                            id="laminationThermalGloss" value="thermal-gloss" onchange="toggleLaminationCost()">
                                         <label class="form-check-label" for="laminationThermalGloss">Gloss</label>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="lamination"
-                                            id="laminationThermalMat" value="thermal-mat">
+                                            id="laminationThermalMat" value="thermal-mat" onchange="toggleLaminationCost()">
                                         <label class="form-check-label" for="laminationThermalMat">Mat</label>
+                                    </div>
+                                    <div id="laminationThermalCostWrap" class="cost-input-wrap mt-2" style="display:none;">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">Rs.</span>
+                                            <input type="number" class="form-control" id="laminationThermalCostPerSheet" placeholder="Cost per sheet" min="0" step="0.01">
+                                        </div>
+                                        <div class="form-text text-muted" style="font-size:0.75rem;">Cost per sheet</div>
                                     </div>
                                 </div>
                                 <!-- Normal Group -->
@@ -278,13 +339,20 @@
                                     <span class="fw-semibold d-block mb-1">Normal</span>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="lamination"
-                                            id="laminationNormalGloss" value="normal-gloss">
+                                            id="laminationNormalGloss" value="normal-gloss" onchange="toggleLaminationCost()">
                                         <label class="form-check-label" for="laminationNormalGloss">Gloss</label>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="lamination"
-                                            id="laminationNormalMat" value="normal-mat">
+                                            id="laminationNormalMat" value="normal-mat" onchange="toggleLaminationCost()">
                                         <label class="form-check-label" for="laminationNormalMat">Mat</label>
+                                    </div>
+                                    <div id="laminationNormalCostWrap" class="cost-input-wrap mt-2" style="display:none;">
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text">Rs.</span>
+                                            <input type="number" class="form-control" id="laminationNormalCostPerSheet" placeholder="Cost per sheet" min="0" step="0.01">
+                                        </div>
+                                        <div class="form-text text-muted" style="font-size:0.75rem;">Cost per sheet</div>
                                     </div>
                                 </div>
                             </div>
@@ -366,10 +434,6 @@
                                     <label for="clientName" class="form-label">Client Name</label>
                                     <input type="text"  class="form-control" id="clientName"
                                         onkeyup="searchClient()">
-                                    <select class="form-select" id="selectClientNames"   onchange="searchClient()">
-                                        <option value="">Select Client Name</option>
-                                        <option th:each="client : ${customerList}" th:value="${client.id}" th:text="${client.name}"></option>
-                                    </select>
                                 </div>
                             </div>
                             <div class="row">
@@ -391,6 +455,11 @@
             </div>
         </div>
 
+            <script th:inline="javascript">
+                 window.globalCustomer = [[${customerList}]];
+            </script>
+
+
         <!-- link jquery -->
         <script th:src="@{/js/jquery-4.0.0.min.js}"></script>
 
@@ -401,9 +470,7 @@
         <!-- link common js file -->
         <script th:src="@{/js/common.js}"></script>
         <!-- get suppliers details into js file-->
-         <script th:inline="javascript">
-            const globalCustomer = [[${customerList}]];
-        </script>
+
 
 
         <!-- link user js file -->

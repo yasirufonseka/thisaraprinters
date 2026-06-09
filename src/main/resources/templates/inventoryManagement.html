@@ -86,8 +86,6 @@
                                 <tr>
                                     <th>Item Name</th>
                                     <th>Available Quantity</th>
-                                    <th>Unit</th>
-                                    <th>Reorder Level</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -95,12 +93,13 @@
                             <tbody>
                                 <!-- Loop through materials from backend -->
                                 <tr th:each="material : ${materials}" th:class="${material.status == 'Low Stock' ? 'low-stock' : ''}">
-                                    <td th:text="${material.material}"></td>
-                                    <td th:text="${material.availablequantity}"></td>
-                                    <td th:text="${material.units}"></td>
-                                    <td th:text="${material.reorderlevel}"></td>
+                                    <td th:text="${material.name}"></td>
                                     <td>
-                                        <span class="badge" th:text="${material.status}" 
+                                        <span th:text="${material.id}" style="display: none;" th:id="${'qty-' + material.id}"></span>
+                                        <span th:id="${'qty-display-' + material.id}">0</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" th:text="${material.status}"
                                             th:class="${material.status == 'Low Stock' ? 'badge bg-danger' : material.status == 'Out of Stock' ? 'badge bg-danger' : 'badge bg-success'}"></span>
                                     </td>
                                     <td class="d-flex flex-row justify-content-center gap-2">
@@ -160,10 +159,10 @@
                                 <!-- Loop through GRNs from backend -->
                                 <tr th:each="grn : ${grns}">
                                     <td class="fw-bold text-start ps-3" th:text="${grn.grnNumber}"></td>
-                                    <td th:text="${grn.itemname != null ? grn.itemname.material : '-'}"></td>
+                                    <td th:text="${grn.variant != null && grn.variant.material != null ? grn.variant.material.name : '-'}"></td>
                                     <td th:text="${grn.suppliers != null ? grn.suppliers.companyname : '-'}"></td>
-                                    <td th:text="${grn.recivedquantity}"></td>
-                                    <td th:text="${grn.units}"></td>
+                                    <td th:text="${grn.receivedquantity}"></td>
+                                    <td th:text="${grn.variant != null ? grn.variant.unit : '-'}"></td>
                                     <td th:text="${grn.supplierInvoiceNo}"></td>
                                     <td th:text="${grn.batchNo}"></td>
                                     <td th:text="${grn.receivedDate}"></td>
@@ -211,10 +210,16 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label for="grnItem" class="form-label">Item / Material</label>
-                            <select class="form-select" id="grnItem" name="materialId" required>
-                                <option selected disabled>Select Item</option>
-                                <option th:each="material : ${materials}" th:value="${material.id}" th:data-unit="${material.units}" th:text="${material.material}"></option>
+                            <label for="grnMaterial" class="form-label">Material Family</label>
+                            <select class="form-select" id="grnMaterial" name="materialId" required onchange="loadVariants()">
+                                <option selected disabled>Select Material</option>
+                                <option th:each="material : ${materials}" th:value="${material.id}" th:text="${material.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="grnVariant" class="form-label">Variant (GSM/Size)</label>
+                            <select class="form-select" id="grnVariant" name="variantId" required>
+                                <option selected disabled>Select Variant</option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -223,14 +228,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="grnUnits" class="form-label">Units</label>
-                            <select class="form-select" id="grnUnits" name="units" required>
-                                <option selected disabled>Select Unit</option>
-                                <option value="Reams">Reams</option>
-                                <option value="Liters">Liters</option>
-                                <option value="Kg">Kg</option>
-                                <option value="Pieces">Pieces</option>
-                                <option value="Boxes">Boxes</option>
-                            </select>
+                            <input type="text" class="form-control" id="grnUnits" name="units" placeholder="Unit (auto-filled)" readonly>
                         </div>
                         <div class="col-md-6">
                             <label for="grnDate" class="form-label">Date Received</label>
@@ -276,7 +274,7 @@
                             <label for="usageItem" class="form-label">Item / Material</label>
                             <select class="form-select" id="usageItem" name="materialId" required>
                                 <option selected disabled>Select Item</option>
-                                <option th:each="material : ${materials}" th:value="${material.id}" th:text="${material.material}"></option>
+                                <option th:each="material : ${materials}" th:value="${material.id}" th:text="${material.name}"></option>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -313,40 +311,20 @@
                 <div class="modal-body">
                     <form class="row g-3" id="materialFormData" onsubmit="submitMaterial(event)">
                         <div class="col-md-6">
-                            <label for="materialName" class="form-label">Item Name</label>
-                            <input type="text" class="form-control" id="materialName" name="material" placeholder="Enter item name" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="materialQuantity" class="form-label">Available Quantity</label>
-                            <input type="number" class="form-control" id="materialQuantity" name="availablequantity" placeholder="Enter quantity" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="materialUnit" class="form-label">Units</label>
-                            <select class="form-select" id="materialUnit" name="units" required>
-                                <option selected disabled>Select Unit</option>
-                                <option value="Reams">Reams</option>
-                                <option value="Liters">Liters</option>
-                                <option value="Kg">Kg</option>
-                                <option value="Pieces">Pieces</option>
-                                <option value="Boxes">Boxes</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="materialReorderLevel" class="form-label">Reorder Level</label>
-                            <input type="number" class="form-control" id="materialReorderLevel" name="reorderlevel" placeholder="Enter reorder level" required>
+                            <label for="materialName" class="form-label">Material Name</label>
+                            <input type="text" class="form-control" id="materialName" name="name" placeholder="Enter material name" required>
                         </div>
                         <div class="col-12">
                             <label for="materialStatus" class="form-label">Status</label>
                             <select class="form-select" id="materialStatus" name="status" required>
                                 <option selected disabled>Select Status</option>
-                                <option value="Sufficient">Sufficient</option>
-                                <option value="Low Stock">Low Stock</option>
-                                <option value="Out of Stock">Out of Stock</option>
+                                <option value="ACTIVE">Active</option>
+                                <option value="INACTIVE">Inactive</option>
                             </select>
                         </div>
                         <div class="col-12 text-end mt-4">
                             <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Add Material</button>
+                            <button type="submit" class="btn btn-primary">Save Material</button>
                         </div>
                     </form>
                 </div>
@@ -375,6 +353,45 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('grnDate').value = today;
             document.getElementById('usageDate').value = today;
+        });
+
+        // Load variants when material is selected
+        function loadVariants() {
+            const materialSelect = document.getElementById('grnMaterial');
+            const variantSelect = document.getElementById('grnVariant');
+            const materialId = materialSelect.value;
+
+            // Clear existing options
+            variantSelect.innerHTML = '<option selected disabled>Select Variant</option>';
+
+            if (materialId) {
+                fetch('/inventory/api/materials/' + materialId + '/variants')
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(variant => {
+                            const option = document.createElement('option');
+                            option.value = variant.id;
+                            let text = 'Unit: ' + variant.unit;
+                            if (variant.gsm) text += ', GSM: ' + variant.gsm;
+                            if (variant.widthMm && variant.heightMm) text += ', Size: ' + variant.widthMm + 'mm x ' + variant.heightMm + 'mm';
+                            option.textContent = text;
+                            option.dataset.unit = variant.unit;
+                            variantSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error loading variants:', error));
+            }
+        }
+
+        // Update units field when variant is selected
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.id === 'grnVariant') {
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                const unitField = document.getElementById('grnUnits');
+                if (selectedOption.dataset.unit) {
+                    unitField.value = selectedOption.dataset.unit;
+                }
+            }
         });
     </script>
 </body>

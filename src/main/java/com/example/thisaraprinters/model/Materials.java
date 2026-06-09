@@ -16,18 +16,13 @@ public class Materials {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "material")
-    private String material;
-    @Column(name = "availablequantity")
-    private Integer availablequantity;
-    @Column(name = "units")
-    private String units;
-    @Column(name = "reorderlevel")
-    private Integer reorderlevel;
+    @Column(name = "name")
+    private String name;
     @Column(name = "status")
     private String status;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private Category categoryid;
 
     @ToString.Exclude
@@ -35,7 +30,14 @@ public class Materials {
     @ManyToMany(mappedBy = "materials")
     private List<Supplier> supplires = new ArrayList<>();
 
+    @ToString.Exclude
+    @JsonIgnore
     @ManyToMany(mappedBy = "materialsList")
     private List<QuotationModel> quotations = new ArrayList<>();
+
+    @ToString.Exclude
+    @JsonIgnore
+    @OneToMany(mappedBy = "material", fetch = FetchType.LAZY)
+    private List<MaterialVariant> variants = new ArrayList<>();
 
 }

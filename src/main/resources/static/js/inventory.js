@@ -3,10 +3,7 @@ function submitMaterial(event) {
     event.preventDefault();
 
     const formData = {
-        material: document.getElementById('materialName').value,
-        availablequantity: parseInt(document.getElementById('materialQuantity').value),
-        units: document.getElementById('materialUnit').value,
-        reorderlevel: parseInt(document.getElementById('materialReorderLevel').value),
+        name: document.getElementById('materialName').value,
         status: document.getElementById('materialStatus').value
     };
 
@@ -31,7 +28,6 @@ function submitMaterial(event) {
         });
     }
 
-    // Close modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('addMaterialModal'));
     if (modal) modal.hide();
 }
@@ -51,24 +47,16 @@ function updateMaterial(materialId) {
 
     const material = response.responseJSON;
 
-    // Populate form with existing data
-    document.getElementById('materialName').value = material.material;
-    document.getElementById('materialQuantity').value = material.availablequantity;
-    document.getElementById('materialUnit').value = material.units;
-    document.getElementById('materialReorderLevel').value = material.reorderlevel;
+    document.getElementById('materialName').value = material.name;
     document.getElementById('materialStatus').value = material.status;
 
-    // Change modal title and button text
     document.getElementById('addMaterialModalHeader').textContent = 'Edit Material';
     document.getElementById('materialFormData').onsubmit = function (event) {
         event.preventDefault();
 
         const updatedData = {
             id: materialId,
-            material: document.getElementById('materialName').value,
-            availablequantity: parseInt(document.getElementById('materialQuantity').value),
-            units: document.getElementById('materialUnit').value,
-            reorderlevel: parseInt(document.getElementById('materialReorderLevel').value),
+            name: document.getElementById('materialName').value,
             status: document.getElementById('materialStatus').value
         };
 
@@ -97,7 +85,6 @@ function updateMaterial(materialId) {
         if (modal) modal.hide();
     };
 
-    // Show modal
     const addMaterialModal = new bootstrap.Modal(document.getElementById('addMaterialModal'));
     addMaterialModal.show();
 }
@@ -145,12 +132,12 @@ function submitGRN(event) {
     const grnData = {
         supplierInvoiceNo: document.getElementById('grnSupplierInvoice').value,
         batchNo: document.getElementById('grnBatchNo').value,
-        recivedquantity: parseInt(document.getElementById('grnQty').value),
+        receivedquantity: parseInt(document.getElementById('grnQty').value),
         units: document.getElementById('grnUnits').value,
         receivedDate: document.getElementById('grnDate').value || null,
         expiryDate: document.getElementById('grnExpiryDate').value || null,
         notes: document.getElementById('grnNotes').value || null,
-        itemname: { id: parseInt(document.getElementById('grnItem').value) },
+        variantId: parseInt(document.getElementById('grnVariant').value),
         suppliers: { id: parseInt(document.getElementById('grnSupplier').value) },
         receivedByUser: { id: parseInt(document.getElementById('grnReceivedBy').value) }
     };
@@ -247,15 +234,10 @@ $(document).ready(function () {
     // Reset GRN form when modal is closed
     $('#grnModal').on('hidden.bs.modal', function () {
         document.getElementById('grnFormData').reset();
+        document.getElementById('grnMaterial').value = '';
+        document.getElementById('grnVariant').innerHTML = '<option selected disabled>Select Variant</option>';
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('grnDate').value = today;
-    });
-
-    $('#grnItem').on('change', function () {
-        const selectedUnit = $(this).find(':selected').data('unit');
-        if (selectedUnit) {
-            $('#grnUnits').val(selectedUnit);
-        }
     });
 
     // Reset Usage form when modal is closed
@@ -266,22 +248,18 @@ $(document).ready(function () {
     });
 });
 
-//manage tab on the html page
 function openTab(evt, tabName) {
-    // hide all content boxes
     var i, tabContent, tabButtons;
     tabContent = document.getElementsByClassName("tab-content");
     for (i = 0; i < tabContent.length; i++) {
         tabContent[i].style.display = "none";
     }
 
-    // remove active class from all buttons
     tabButtons = document.getElementsByClassName("tab-btn");
     for (i = 0; i < tabButtons.length; i++) {
         tabButtons[i].className = tabButtons[i].className.replace(" active", "");
     }
 
-    // show clicked content box and add active class to clicked button
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
 }
@@ -291,3 +269,4 @@ document.addEventListener("DOMContentLoaded", function () {
     const defaultTab = document.querySelector(".tab-btn");
     if (defaultTab) defaultTab.click();
 });
+

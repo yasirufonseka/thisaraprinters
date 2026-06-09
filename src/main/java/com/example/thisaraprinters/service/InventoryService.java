@@ -2,11 +2,11 @@ package com.example.thisaraprinters.service;
 
 import com.example.thisaraprinters.dto.InventoryDto;
 import com.example.thisaraprinters.model.Inventory;
-import com.example.thisaraprinters.model.Materials;
+import com.example.thisaraprinters.model.MaterialVariant;
 import com.example.thisaraprinters.model.Supplier;
 import com.example.thisaraprinters.model.UserModel;
 import com.example.thisaraprinters.repository.InventoryRepository;
-import com.example.thisaraprinters.repository.MaterialRepo;
+import com.example.thisaraprinters.repository.MaterialVariantRepository;
 import com.example.thisaraprinters.repository.SupplierRepo;
 import com.example.thisaraprinters.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +22,22 @@ import org.springframework.data.domain.Sort;
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
-    private final MaterialRepo materialRepo;
+    private final MaterialVariantRepository variantRepo;
     private final SupplierRepo supplierRepo;
     private final UserRepo userRepo;
+    private final StockLotService stockLotService;
 
     @Autowired
     public InventoryService(InventoryRepository inventoryRepository,
-                            MaterialRepo materialRepo,
+                            MaterialVariantRepository variantRepo,
                             SupplierRepo supplierRepo,
-                            UserRepo userRepo) {
+                            UserRepo userRepo,
+                            StockLotService stockLotService) {
         this.inventoryRepository = inventoryRepository;
-        this.materialRepo = materialRepo;
+        this.variantRepo = variantRepo;
         this.supplierRepo = supplierRepo;
         this.userRepo = userRepo;
+        this.stockLotService = stockLotService;
     }
 
     @Transactional
@@ -45,9 +48,9 @@ public class InventoryService {
                 return validationError;
             }
 
-            Materials material = materialRepo.findById(inventory.getItemname().getId()).orElse(null);
-            if (material == null) {
-                return "Error: Material not found";
+            MaterialVariant variant = variantRepo.findById(Long.valueOf(inventory.getVariantId())).orElse(null);
+            if (variant == null) {
+                return "Error: Material variant not found";
             }
 
             Supplier supplier = supplierRepo.findById(inventory.getSuppliers().getId()).orElse(null);
@@ -60,8 +63,8 @@ public class InventoryService {
                 return "Error: Received By user not found";
             }
 
-            if (material.getUnits() != null && !material.getUnits().equalsIgnoreCase(inventory.getUnits().trim())) {
-                return "Error: GRN unit must match material unit: " + material.getUnits();
+            if (!variant.getUnit().equalsIgnoreCase(inventory.getUnits().trim())) {
+                return "Error: GRN unit must match variant unit: " + variant.getUnit();
             }
 
             LocalDate receivedDate = inventory.getReceivedDate() != null ? inventory.getReceivedDate() : LocalDate.now();
@@ -73,21 +76,17 @@ public class InventoryService {
             inventoryEntity.setGrnNumber(generateNextGRNNumber());
             inventoryEntity.setSupplierInvoiceNo(inventory.getSupplierInvoiceNo().trim());
             inventoryEntity.setBatchNo(inventory.getBatchNo().trim());
-            inventoryEntity.setRecivedquantity(inventory.getRecivedquantity());
-            inventoryEntity.setUnits(inventory.getUnits().trim());
+            inventoryEntity.setReceivedquantity(inventory.getReceivedquantity());
             inventoryEntity.setExpiryDate(inventory.getExpiryDate());
             inventoryEntity.setReceivedDate(receivedDate);
             inventoryEntity.setNotes(inventory.getNotes());
-            inventoryEntity.setItemname(material);
+            inventoryEntity.setVariant(variant);
             inventoryEntity.setSuppliers(supplier);
             inventoryEntity.setReceivedByUser(receivedBy);
 
             inventoryRepository.save(inventoryEntity);
 
-            int currentQuantity = material.getAvailablequantity() == null ? 0 : material.getAvailablequantity();
-            material.setAvailablequantity(currentQuantity + inventory.getRecivedquantity());
-            updateMaterialStatus(material);
-            materialRepo.save(material);
+            stockLotService.createGrnLot(inventoryEntity);
 
             return "GRN saved successfully: " + inventoryEntity.getGrnNumber();
         } catch (Exception e) {
@@ -127,7 +126,7 @@ public class InventoryService {
         if (inventory.getBatchNo() == null || inventory.getBatchNo().trim().isEmpty()) {
             return "Error: Batch Number is required";
         }
-        if (inventory.getRecivedquantity() == null || inventory.getRecivedquantity() <= 0) {
+        if (inventory.getReceivedquantity() == null || inventory.getReceivedquantity() <= 0) {
             return "Error: Received Quantity must be greater than 0";
         }
         if (inventory.getUnits() == null || inventory.getUnits().trim().isEmpty()) {
@@ -136,8 +135,8 @@ public class InventoryService {
         if (inventory.getSuppliers() == null || inventory.getSuppliers().getId() == null) {
             return "Error: Supplier is required";
         }
-        if (inventory.getItemname() == null || inventory.getItemname().getId() == null) {
-            return "Error: Material/Item is required";
+        if (inventory.getVariantId() == null) {
+            return "Error: Material variant is required";
         }
         if (inventory.getReceivedByUser() == null || inventory.getReceivedByUser().getId() == null) {
             return "Error: Received By user is required";
@@ -146,21 +145,7 @@ public class InventoryService {
         return null;
     }
 
-    private void updateMaterialStatus(Materials material) {
-        int availableQuantity = material.getAvailablequantity() == null ? 0 : material.getAvailablequantity();
-        int reorderLevel = material.getReorderlevel() == null ? 0 : material.getReorderlevel();
-
-        if (availableQuantity == 0) {
-            material.setStatus("Out of Stock");
-        } else if (availableQuantity < reorderLevel) {
-            material.setStatus("Low Stock");
-        } else {
-            material.setStatus("Sufficient");
-        }
-    }
-
     public List<Inventory> getAllGRNs() {
         return inventoryRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 }
-

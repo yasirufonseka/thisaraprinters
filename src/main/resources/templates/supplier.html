@@ -324,7 +324,7 @@
                                         class="text-danger">*</span></label>
                                 <select class="form-select w-75" id="poItem" name="items" required>
                                     <option value="" selected disabled>Select Item / Material</option>
-                                    <option th:each="mat : ${materialsList}" th:value="${mat.material}" th:text="${mat.material}"></option>
+                                    <option th:each="mat : ${materialsList}" th:value="${mat.name}" th:text="${mat.name}"></option>
                                 </select>
                             </div>
                             <div class="mb-3 w-50">

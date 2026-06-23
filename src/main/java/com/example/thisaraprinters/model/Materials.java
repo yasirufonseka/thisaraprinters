@@ -16,7 +16,7 @@ public class Materials {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "name")
+    @Column(name = "material")
     private String name;
     @Column(name = "status")
     private String status;

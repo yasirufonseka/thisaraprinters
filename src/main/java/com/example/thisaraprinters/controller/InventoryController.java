@@ -101,6 +101,22 @@ public class InventoryController {
         return ResponseEntity.status(statusCode).body(Map.of("message", result));
     }
 
+    @PostMapping("/api/materials/usage")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> recordMaterialUsage(@RequestBody Map<String, Object> request) {
+        try {
+            Integer materialId = ((Number) request.get("materialId")).intValue();
+            Integer quantityUsed = ((Number) request.get("quantityUsed")).intValue();
+            String purpose = (String) request.get("purpose");
+
+            String result = materialsService.recordMaterialUsage(materialId, quantityUsed, purpose);
+            int statusCode = result.contains("successfully") ? 200 : 400;
+            return ResponseEntity.status(statusCode).body(Map.of("message", result));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("message", "Invalid request: " + e.getMessage()));
+        }
+    }
+
     @PostMapping("/api/grn/save-full")
     @ResponseBody
     public ResponseEntity<Map<String, String>> saveGRNFull(@RequestBody InventoryDto inventory) {

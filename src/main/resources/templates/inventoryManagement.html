@@ -91,22 +91,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Loop through materials from backend -->
-                                <tr th:each="material : ${materials}" th:class="${material.status == 'Low Stock' ? 'low-stock' : ''}">
-                                    <td th:text="${material.name}"></td>
-                                    <td>
-                                        <span th:text="${material.id}" style="display: none;" th:id="${'qty-' + material.id}"></span>
-                                        <span th:id="${'qty-display-' + material.id}">0</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge" th:text="${material.status}"
-                                            th:class="${material.status == 'Low Stock' ? 'badge bg-danger' : material.status == 'Out of Stock' ? 'badge bg-danger' : 'badge bg-success'}"></span>
-                                    </td>
-                                    <td class="d-flex flex-row justify-content-center gap-2">
-                                        <button class="btn btn-sm btn-teal px-3 py-2 text-dark" th:onclick="|updateMaterial(${material.id})|">Edit</button>
-                                        <button class="btn btn-sm btn-red px-3 py-2 text-dark" th:onclick="|deleteMaterial(${material.id})|">Delete</button>
-                                    </td>
-                                </tr>
+                                <!-- Loop through materials and their variants from backend -->
+                                <th:block th:each="material : ${materials}">
+                                    <tr th:each="variant : ${material.variants}" th:class="${variant.calculatedStatus == 'Low Stock' ? 'low-stock' : ''}">
+                                        <td>
+                                            <span th:text="${material.name}" class="fw-semibold"></span>
+                                            <span th:text="${variant.gsm != null ? ' - ' + variant.gsm + ' GSM' : ''}"></span>
+                                            <span th:text="${variant.widthMm != null && variant.heightMm != null ? ' (' + variant.widthMm + 'x' + variant.heightMm + ' mm)' : ''}"></span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${variant.availableQuantity != null ? variant.availableQuantity : 0}">0</span>
+                                            <span class="text-muted" th:text="${' ' + variant.unit}"></span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" th:text="${variant.calculatedStatus}"
+                                                th:class="${variant.calculatedStatus == 'Low Stock' ? 'badge bg-warning text-dark' : variant.calculatedStatus == 'Out of Stock' ? 'badge bg-danger' : 'badge bg-success'}"></span>
+                                        </td>
+                                        <td class="d-flex flex-row justify-content-center gap-2">
+                                            <button class="btn btn-sm btn-teal px-3 py-2 text-dark" th:onclick="|updateMaterial(${material.id})|">Edit</button>
+                                            <button class="btn btn-sm btn-red px-3 py-2 text-dark" th:onclick="|deleteMaterial(${material.id})|">Delete</button>
+                                        </td>
+                                    </tr>
+                                </th:block>
                             </tbody>
                         </table>
                     </div>

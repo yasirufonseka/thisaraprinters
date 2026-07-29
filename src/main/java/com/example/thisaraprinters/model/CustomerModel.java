@@ -1,8 +1,10 @@
 package com.example.thisaraprinters.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.ToString;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -43,6 +45,8 @@ public class CustomerModel {
     @Column(name = "updateddate")
     private LocalDate updateddate;
 
+    @ToString.Exclude
+    @JsonIgnore
     @OneToMany(mappedBy = "customer")
     private List<QuotationModel> quotations;
 

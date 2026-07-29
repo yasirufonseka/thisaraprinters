@@ -21,7 +21,7 @@ public class CustomerService {
         return customerRepo.findAll();
     }
 
-    public CustomerModel getCustomerById(Long id) {
+    public CustomerModel getCustomerById(Integer id) {
         return customerRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id " + id));
     }
@@ -49,7 +49,7 @@ public class CustomerService {
         return customerRepo.save(customer);
     }
 
-    public CustomerModel updateCustomer(Long id, CustomerDto dto) {
+    public CustomerModel updateCustomer(Integer id, CustomerDto dto) {
         CustomerModel existing = getCustomerById(id);
 
         if (customerRepo.existsByNameAndIdNot(dto.getName(), id)) {
@@ -72,7 +72,7 @@ public class CustomerService {
         return customerRepo.save(existing);
     }
 
-    public void deleteCustomer(Long id) {
+    public void deleteCustomer(Integer id) {
         customerRepo.deleteById(id);
     }
 }

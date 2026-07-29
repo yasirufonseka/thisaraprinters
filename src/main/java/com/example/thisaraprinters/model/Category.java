@@ -18,14 +18,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Data
 public class Category {
 
-    @Id
+  @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
+
     private String name;
-    @ToString.Exclude
-    @JsonIgnore
-    @ManyToMany(mappedBy = "category")
-    private List<Supplier> suppliers;
+
 }
     
 

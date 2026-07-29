@@ -1,7 +1,7 @@
 package com.example.thisaraprinters.dto;
 
 import com.example.thisaraprinters.model.CustomerModel;
-import com.example.thisaraprinters.model.Materials;
+import com.example.thisaraprinters.model.MaterialVariant;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,5 +27,18 @@ public class QuotationDto {
     private LocalDate expiryDate;
     private LocalDate addeddate;
     private CustomerModel customer;
-    private List<Materials> materialsList;
+    private List<MaterialVariant> materialsList;
+
+    // Cost Breakdown Fields
+    private double paperRatePerSheet;
+    private double paperCost;
+    private double finishingCost;
+    private double impressionCost;
+    private Integer wastageSheets;
+    private Double edgeMarginMm;
+    private Double gutterMm;
+    private double serviceChargePercentage;
+    private double serviceChargeAmount;
+    private double unitPrice;
 }
+

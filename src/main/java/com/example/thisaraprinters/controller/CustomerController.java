@@ -43,20 +43,20 @@ public class CustomerController {
 
     @GetMapping("/getcustomer/{id}")
     @ResponseBody
-    public CustomerModel getCustomer(@PathVariable("id") Long id) {
+    public CustomerModel getCustomer(@PathVariable("id") Integer id) {
         return customerService.getCustomerById(id);
     }
 
     @PostMapping("/update/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> updateCustomer(@jakarta.validation.Valid @RequestBody CustomerDto customerDto, @PathVariable("id") Long id) {
+    public ResponseEntity<Map<String, String>> updateCustomer(@jakarta.validation.Valid @RequestBody CustomerDto customerDto, @PathVariable("id") Integer id) {
         customerService.updateCustomer(id, customerDto);
         return ResponseEntity.ok(Map.of("message", "Customer updated successfully"));
     }
 
     @DeleteMapping("/delete/{id}")
     @ResponseBody
-    public ResponseEntity<Map<String, String>> deleteCustomer(@PathVariable("id") Long id) {
+    public ResponseEntity<Map<String, String>> deleteCustomer(@PathVariable("id") Integer id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.ok(Map.of("message", "Customer deleted successfully"));
     }

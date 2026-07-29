@@ -7,7 +7,7 @@ import java.util.List;
 import com.example.thisaraprinters.repository.ModuleRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.thisaraprinters.dto.UserDto;
@@ -27,15 +27,15 @@ public class UserService {
     private final ModuleRepo moduleRepo;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    // private BCryptPasswordEncoder passwordEncoder;
+   // private BCryptPasswordEncoder passwordEncoder;
+//BCryptPasswordEncoder passwordEncoder
 
     public UserService(UserRepo userRepo, RoleRepo roleRepo, EmployeeRepo employeeRepo,ModuleRepo moduleRepo) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.employeeRepo = employeeRepo;
         this.moduleRepo = moduleRepo;
+        //this.passwordEncoder = passwordEncoder;
 
     }
 
@@ -50,7 +50,7 @@ public class UserService {
             newUser.setEmployeeid(employeeRepo.findById(user.getEmployeeid()).orElse(null));
         }
         newUser.setUsername(user.getUsername());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+      //  newUser.setPassword(passwordEncoder.encode(user.getPassword()));
         newUser.setNote(user.getNote());
         
         if (user.getRoleId() != null) {
@@ -89,7 +89,7 @@ public class UserService {
         else{       
             existingUser.setEmployeeid(employeeRepo.findById(user.getEmployeeid()).orElse(null));
             existingUser.setUsername(user.getUsername());
-            existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
+           // existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
             existingUser.setNote(user.getNote());
             existingUser.setStatus(user.getStatus());
             existingUser.setUserphoto(user.getUserphoto());

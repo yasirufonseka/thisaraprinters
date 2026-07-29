@@ -1,4 +1,4 @@
-package com.example.thisaraprinters.config;
+ package com.example.thisaraprinters.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,23 +36,22 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
+       http
+           .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-            /*    // Public resources
-                .requestMatchers("/login", "/css/**", "/js/**", "/sweetalert2/**", "/images/**").permitAll()
+                .requestMatchers("/login", "/css/**", "/js/**", "/sweetalert2/**", "/images/**", "/artwork-uploads/**").permitAll()
 
-                // ===== Employee Module =====
+//                 ===== Employee Module =====
                 .requestMatchers(HttpMethod.GET, "/employees/employeemodel").hasAuthority("Employee_VIEW")
                 .requestMatchers(HttpMethod.GET, "/employees/get/**").hasAuthority("Employee_VIEW")
                 .requestMatchers(HttpMethod.GET, "/employees/getemployees").hasAuthority("Employee_VIEW")
                 .requestMatchers(HttpMethod.POST, "/employees/add/**").hasAuthority("Employee_INSERT")
                 .requestMatchers(HttpMethod.PUT, "/employees/update/**").hasAuthority("Employee_UPDATE")
                 .requestMatchers(HttpMethod.DELETE, "/employees/delete/**").hasAuthority("Employee_DELETE")
-                .requestMatchers("/employees/**").hasAuthority("Employee_VIEW")
+                .requestMatchers("/employees/**").hasAuthority("Employee_VIEW") 
 
                 // ===== Order Module =====
-                .requestMatchers(HttpMethod.GET, "/order/ordermanagement").hasAuthority("Order_VIEW")
+                .requestMatchers(HttpMethod.GET, "/order/management").hasAuthority("Order_VIEW")
                 .requestMatchers(HttpMethod.GET, "/order/getall/**").hasAuthority("Order_VIEW")
                 .requestMatchers(HttpMethod.POST, "/order/add/**").hasAuthority("Order_INSERT")
                 .requestMatchers(HttpMethod.POST, "/order/update/**").hasAuthority("Order_UPDATE")
@@ -62,8 +61,9 @@ public class SecurityConfig {
                 // ===== Supplier Module =====
                 .requestMatchers(HttpMethod.GET, "/supplier/**").hasAuthority("Supplier_VIEW")
                 .requestMatchers(HttpMethod.POST, "/supplier/add/**").hasAuthority("Supplier_INSERT")
-                .requestMatchers(HttpMethod.POST, "/supplier/update/**").hasAuthority("Supplier_UPDATE")
-                .requestMatchers(HttpMethod.DELETE, "/supplier/delete/**").hasAuthority("Supplier_DELETE")
+                .requestMatchers(HttpMethod.POST, "/supplier/update/**", "/supplier/purchaseorder/update/**").hasAuthority("Supplier_UPDATE")
+                .requestMatchers(HttpMethod.POST, "/supplier/purchaseorder/**").hasAnyAuthority("Supplier_INSERT", "Supplier_UPDATE")
+                .requestMatchers(HttpMethod.DELETE, "/supplier/delete/**", "/supplier/purchaseorder/delete/**").hasAuthority("Supplier_DELETE")
                 .requestMatchers("/supplier/**").hasAuthority("Supplier_VIEW")
 
                 // ===== Inventory Module =====
@@ -98,22 +98,31 @@ public class SecurityConfig {
                 .requestMatchers("/user/**").hasAuthority("User_VIEW")
                 .requestMatchers("/privilege/**").hasAuthority("User_VIEW")
 
-                // Everything else requires authentication
-                .anyRequest().authenticated()*/
-    //        )
-//            .formLogin(form -> form
-//                .loginPage("/login")
-//                .loginProcessingUrl("/login")
-//                .defaultSuccessUrl("/dashboard", true)
-//                .failureUrl("/login?error=true")
-//                .permitAll()
-//            )
-//            .logout(logout -> logout
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/login?logout=true")
-//                .permitAll()
-//            );
-            .anyRequest().permitAll()
+                // ===== Reports Module =====
+                .requestMatchers("/reports/**").authenticated()
+
+                // ===== Payment Module =====
+                .requestMatchers(HttpMethod.GET, "/payment/management").authenticated()
+                .requestMatchers(HttpMethod.GET, "/payment/supplier-orders").hasAuthority("Supplier_VIEW")
+                .requestMatchers(HttpMethod.POST, "/payment/supplier/**").hasAuthority("Supplier_UPDATE")
+                .requestMatchers(HttpMethod.GET, "/payment/customer-payments").hasAuthority("Customer_VIEW")
+                .requestMatchers(HttpMethod.GET, "/payment/invoice/**").hasAuthority("Customer_VIEW")
+                .requestMatchers(HttpMethod.POST, "/payment/customer/**").hasAnyAuthority("Customer_INSERT", "Customer_UPDATE")
+
+                    //Everything else requires authentication
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/dashboard", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .permitAll()
             );
 
         return http.build();

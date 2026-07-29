@@ -256,11 +256,7 @@ const filterCustomers = () => {
 };
 
 const editCustomer = (id) => {
-    $.ajax({
-        url: `/customer/getcustomer/${id}`,
-        type: 'GET',
-        dataType: 'json'
-    }).done((customer) => {
+    getHTTPService(`/customer/getcustomer/${id}`, 'GET', 'json').done((customer) => {
         if (!customer || !customer.id) {
             swal.fire({
                 icon: 'error',
@@ -351,14 +347,3 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Tab switching function (matches supplier page)
-function openTab(evt, tabName) {
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(tc => tc.style.display = 'none');
-
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    tabBtns.forEach(btn => btn.classList.remove('active'));
-
-    document.getElementById(tabName).style.display = 'block';
-    evt.currentTarget.classList.add('active');
-}

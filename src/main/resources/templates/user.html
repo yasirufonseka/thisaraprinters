@@ -81,10 +81,10 @@
                         <tbody>
                             <!-- show user data -->
                             <tr th:each="user : ${users}">
-                                <td th:text="${user.employeeid.fullname}">John Doe (E001)</td>
+                                <td th:text="${user.employeeid?.fullname ?: 'No Employee'}">John Doe (E001)</td>
                                 <td th:text="${user.username}"></td>
-                                <td th:text="${user.employeeid.email}"></td>
-                                <td th:text="${user.employeeid.designationid.designation}">johndoe@example.com</td>
+                                <td th:text="${user.employeeid?.email ?: 'N/A'}"></td>
+                                <td th:text="${user.employeeid?.designationid?.designation ?: 'N/A'}">johndoe@example.com</td>
                                 <td><span class="badge" th:text="${user.status}"
                                         th:class="${user.status == 'Active' ? 'badge bg-success' : 'badge bg-danger'}"></span>
                                 </td>
@@ -165,18 +165,21 @@
                                 <select class="form-select w-75" id="userEmployee" name="employeeid">
                                     <option value="" selected disabled>Select Employee</option>
                                 </select>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="username" class="form-label">Username: <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control w-75" id="username" name="username"
                                     placeholder="Enter username" autocomplete="username">
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="userPassword" class="form-label">Password: <span
                                         class="text-danger">*</span></label>
                                 <input type="password" class="form-control w-75" id="userPassword" name="password"
                                     placeholder="Enter password" autocomplete="new-password">
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="userNote" class="form-label">Note: </label>
@@ -189,6 +192,7 @@
                                     <option value="" selected disabled>Select Role</option>
 
                                 </select>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="userStatus" class="form-label">Status: <span

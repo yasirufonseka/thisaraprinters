@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,16 +26,18 @@ public class SupplierService {
     private final PriceRequestReplyRepo priceRequestReplyRepo;
     private final PurchaseOrderRepo purchaseOrderRepo;
     private final CategoryRepo categoryRepo;
+    private final SupplierPaymentRepo supplierPaymentRepo;
     @Autowired
      private EmailService emailService;
 
-    SupplierService(SupplierRepo supplierRepo, MaterialRepo materialRepo, PriceRequestRepo  priceRequestRepo, PriceRequestReplyRepo priceRequestReplyRepo, PurchaseOrderRepo purchaseOrderRepo,CategoryRepo categoryRepo) {
+    SupplierService(SupplierRepo supplierRepo, MaterialRepo materialRepo, PriceRequestRepo  priceRequestRepo, PriceRequestReplyRepo priceRequestReplyRepo, PurchaseOrderRepo purchaseOrderRepo, CategoryRepo categoryRepo, SupplierPaymentRepo supplierPaymentRepo) {
         this.supplierRepo = supplierRepo;
         this.materialRepo = materialRepo;
         this.priceRequestRepo = priceRequestRepo;
         this.priceRequestReplyRepo = priceRequestReplyRepo;
         this.purchaseOrderRepo = purchaseOrderRepo;
         this.categoryRepo = categoryRepo;
+        this.supplierPaymentRepo = supplierPaymentRepo;
     }
 
     public List<Supplier> getAllUsers() {
@@ -210,18 +215,87 @@ public class SupplierService {
             order.setCreatedDate(LocalDate.now());
 
             purchaseOrderRepo.save(order);
+
+            if (dto.getPaymentStatus() != null && !dto.getPaymentStatus().isBlank()) {
+                SupplierPayment payment = new SupplierPayment();
+                payment.setPurchaseOrder(order);
+                payment.setSupplier(order.getSupplier());
+                payment.setPaymentStatus(dto.getPaymentStatus());
+                payment.setCreatedAt(LocalDateTime.now());
+                supplierPaymentRepo.save(payment);
+            }
             return "Purchase Order created successfully";
         } catch (Exception e) {
             throw new RuntimeException("Failed to create Purchase Order: " + e.getMessage());
         }
     }
 
-    public List<com.example.thisaraprinters.model.PurchaseOrder> getAllPurchaseOrders() {
-        return purchaseOrderRepo.findAll();
+    public String updatePurchaseOrder(Integer id, com.example.thisaraprinters.dto.PurchaseOrderDto dto) {
+        try {
+            com.example.thisaraprinters.model.PurchaseOrder order = purchaseOrderRepo.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Purchase Order not found"));
+
+            order.setSupplier(supplierRepo.findById(dto.getSupplierId())
+                    .orElseThrow(() -> new RuntimeException("Supplier not found")));
+
+            if (dto.getPriceRequestId() != null) {
+                order.setPriceRequest(priceRequestRepo.findById(dto.getPriceRequestId())
+                        .orElseThrow(() -> new RuntimeException("Price Request not found")));
+            } else {
+                order.setPriceRequest(null);
+            }
+
+            order.setOrderDate(dto.getOrderDate());
+            order.setItems(dto.getItems());
+            order.setQuantity(dto.getQuantity());
+            order.setPaymentStatus(dto.getPaymentStatus());
+            order.setNotes(dto.getNotes());
+
+            purchaseOrderRepo.save(order);
+
+            if (dto.getPaymentStatus() != null && !dto.getPaymentStatus().isBlank()) {
+                SupplierPayment payment = supplierPaymentRepo.findTopByPurchaseOrder_IdOrderByCreatedAtDesc(id)
+                        .orElseGet(() -> {
+                            SupplierPayment p = new SupplierPayment();
+                            p.setPurchaseOrder(order);
+                            p.setSupplier(order.getSupplier());
+                            return p;
+                        });
+                payment.setPaymentStatus(dto.getPaymentStatus());
+                payment.setSupplier(order.getSupplier());
+                payment.setCreatedAt(LocalDateTime.now());
+                supplierPaymentRepo.save(payment);
+            }
+            return "Purchase Order updated successfully";
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update Purchase Order: " + e.getMessage());
+        }
+    }
+
+    public List<PurchaseOrder> getAllPurchaseOrders() {
+        return purchaseOrderRepo.findAll().stream()
+                .peek(this::attachLatestPaymentInfo)
+                .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getPurchaseOrdersForGrn() {
+        return getAllPurchaseOrders().stream()
+                .map(order -> {
+                    Map<String, Object> purchaseOrder = new LinkedHashMap<>();
+                    purchaseOrder.put("id", order.getId());
+                    purchaseOrder.put("poNumber", order.getId() != null ? "PO-" + order.getId() : "");
+                    purchaseOrder.put("items", order.getItems());
+                    purchaseOrder.put("supplierId", order.getSupplier() != null ? order.getSupplier().getId() : null);
+                    purchaseOrder.put("supplierName", order.getSupplier() != null ? order.getSupplier().getCompanyname() : "");
+                    return purchaseOrder;
+                })
+                .collect(Collectors.toList());
     }
 
     public String deletePurchaseOrder(Integer id) {
         try {
+            supplierPaymentRepo.findByPurchaseOrder_Id(id)
+                    .forEach(supplierPaymentRepo::delete);
             purchaseOrderRepo.deleteById(id);
             return "Purchase Order deleted successfully";
         } catch (Exception e) {
@@ -233,26 +307,56 @@ public class SupplierService {
         try {
             com.example.thisaraprinters.model.PurchaseOrder order = purchaseOrderRepo.findById(orderId)
                     .orElseThrow(() -> new RuntimeException("Purchase Order not found"));
-            
-            order.setPaymentStatus(paymentStatus);
+
+            String resolvedStatus = (paymentStatus != null && !paymentStatus.isBlank()) ? paymentStatus : "Unpaid";
+            SupplierPayment payment = supplierPaymentRepo.findTopByPurchaseOrder_IdOrderByCreatedAtDesc(orderId)
+                    .orElseGet(SupplierPayment::new);
+
+            payment.setPurchaseOrder(order);
+            payment.setSupplier(order.getSupplier());
+            payment.setPaymentStatus(resolvedStatus);
             if (paymentMethod != null && !paymentMethod.isEmpty()) {
-                order.setPaymentMethod(paymentMethod);
+                payment.setPaymentMethod(paymentMethod);
             }
             if (paidAmount != null) {
-                order.setPaidAmount(paidAmount);
+                payment.setPaidAmount(paidAmount);
             }
             if (paymentProofFileName != null && !paymentProofFileName.isEmpty()) {
-                order.setPaymentProof(paymentProofFileName);
+                payment.setPaymentProof(paymentProofFileName);
             }
             if (paymentNotes != null && !paymentNotes.isEmpty()) {
-                order.setNotes(paymentNotes);
+                payment.setPaymentNotes(paymentNotes);
             }
-            
-            purchaseOrderRepo.save(order);
+            payment.setCreatedAt(LocalDateTime.now());
+            supplierPaymentRepo.save(payment);
+
+            attachLatestPaymentInfo(order);
             return "Payment status updated successfully";
         } catch (Exception e) {
             throw new RuntimeException("Failed to update payment status: " + e.getMessage());
         }
     }
-}
 
+    private void attachLatestPaymentInfo(com.example.thisaraprinters.model.PurchaseOrder order) {
+        if (order == null || order.getId() == null) {
+            return;
+        }
+
+        SupplierPayment payment = supplierPaymentRepo.findTopByPurchaseOrder_IdOrderByCreatedAtDesc(order.getId())
+                .orElse(null);
+        if (payment == null) {
+            order.setPaymentStatus("Unpaid");
+            order.setPaymentMethod(null);
+            order.setPaidAmount(0.0);
+            order.setPaymentProof(null);
+            order.setPaymentNotes(null);
+            return;
+        }
+
+        order.setPaymentStatus(payment.getPaymentStatus());
+        order.setPaymentMethod(payment.getPaymentMethod());
+        order.setPaidAmount(payment.getPaidAmount());
+        order.setPaymentProof(payment.getPaymentProof());
+        order.setPaymentNotes(payment.getPaymentNotes());
+    }
+}

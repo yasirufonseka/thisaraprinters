@@ -31,4 +31,19 @@ public class ProductionModel {
 
     @Column(name = "status")
     private String status; // "New Orders", "Design Phase", "Printing", "Finishing", "Ready to Deliver", "Dispatched"
+
+    @Column(name = "artwork_path")
+    private String artworkPath; // server-side path to the uploaded design file
+
+    @Column(name = "artwork_original_name")
+    private String artworkOriginalName; // original file name shown to the user
+
+    @Column(name = "date_sent_ to_ production")
+    private LocalDate dateSentToProduction;
+
+
+    @OneToOne( cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name ="quotations_id" , referencedColumnName = "id")
+    private QuotationModel quotationid;
 }
+

@@ -1,6 +1,7 @@
 package com.example.thisaraprinters.service;
 
 import com.example.thisaraprinters.dto.EmployeeDto;
+import com.example.thisaraprinters.model.DesignationModel;
 import com.example.thisaraprinters.model.EmployeeModel;
 import com.example.thisaraprinters.model.UserModel;
 import com.example.thisaraprinters.repository.DesignationRepo;
@@ -26,14 +27,14 @@ public class EmployeeService {
     private final UserRepo userRepo;
     private final DesignationRepo designationRepo;
     @Autowired
-    private PasswordEncoder passwordEncoder;
-    
+   // private PasswordEncoder passwordEncoder;
+ //PasswordEncoder passwordEncoder
 
-    public EmployeeService(EmployeeRepo employeeRepo, UserRepo userRepo, DesignationRepo designationRepo, PasswordEncoder passwordEncoder) {
+    public EmployeeService(EmployeeRepo employeeRepo, UserRepo userRepo, DesignationRepo designationRepo) {
         this.employeeRepo = employeeRepo;
         this.userRepo = userRepo;
         this.designationRepo = designationRepo;
-        this.passwordEncoder = passwordEncoder;
+      //  this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -67,7 +68,7 @@ public class EmployeeService {
                 // save user info for user table to create system user profile for the employee
                 UserModel newUser = new UserModel();
                 newUser.setUsername(employee.getEmail());
-                newUser.setPassword(passwordEncoder.encode(employee.getNic())); // Set initial password as NIC (hashed)
+              //  newUser.setPassword(passwordEncoder.encode(employee.getNic())); // Set initial password as NIC (hashed)
                 newUser.setAddeddate(LocalDate.now());
                 newUser.setUpdateddate(null);
                 newUser.setNote("User created by system");
@@ -131,5 +132,11 @@ public class EmployeeService {
                 .orElseThrow(() -> new RuntimeException("Employee not found with id: " + id));
         employeeRepo.delete(existingEmployee);
         return "Employee deleted";
+    }
+
+    // get all designations
+    public List<DesignationModel> getAllDesignations() {
+        System.out.println(designationRepo.findAll());
+        return designationRepo.findAll();
     }
 }

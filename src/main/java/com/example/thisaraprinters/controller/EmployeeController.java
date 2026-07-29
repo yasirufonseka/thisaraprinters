@@ -1,10 +1,12 @@
 package com.example.thisaraprinters.controller;
 
 import com.example.thisaraprinters.dto.EmployeeDto;
+import com.example.thisaraprinters.model.DesignationModel;
 import com.example.thisaraprinters.model.EmployeeModel;
 import com.example.thisaraprinters.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -12,7 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequestMapping("/employees")
 public class EmployeeController {
 
@@ -69,6 +71,11 @@ public class EmployeeController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", "Error deleting employee"));
         }
+    }
+
+    @GetMapping("/get/designations")
+    public ResponseEntity<List<DesignationModel>> getDesignations() {
+        return ResponseEntity.ok(employeeService.getAllDesignations());
     }
 
 }

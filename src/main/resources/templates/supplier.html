@@ -171,9 +171,27 @@
                 </div>
             </div>
 
-            <!-- supplier paymetn tab -->
+            <!-- supplier payment tab -->
 
             <div id="supplierPayments" class="tab-content">
+                <!-- Info banner linking to the Payment Module -->
+                <div class="alert d-flex align-items-center gap-3 mb-4"
+                     style="background: linear-gradient(135deg,#1B263B,#2d3f5f); color:#fff; border:none; border-radius:10px; padding:16px 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#FFC107">
+                        <path d="M560-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM280-320q-33 0-56.5-23.5T200-400v-320q0-33 23.5-56.5T280-800h560q33 0 56.5 23.5T920-720v320q0 33-23.5 56.5T840-320H280Zm80-80h400q0-33 23.5-56.5T840-480v-160q-33 0-56.5-23.5T760-720H360q0 33-23.5 56.5T280-640v160q33 0 56.5 23.5T360-400Zm-240 240q-33 0-56.5-23.5T40-240v-440h80v440h680v80H120Zm160-240v-320 320Z"/>
+                    </svg>
+                    <div class="flex-grow-1">
+                        <strong style="font-size:1rem;">Supplier Payments have moved!</strong>
+                        <div style="font-size:0.85rem; opacity:0.85; margin-top:2px;">
+                            All supplier payment tracking and customer invoicing is now managed in the dedicated <strong>Payment Module</strong>.
+                        </div>
+                    </div>
+                    <a th:href="@{/payment/management}" class="btn btn-sm"
+                       style="background:#FFC107; color:#1A1A1A; font-weight:700; white-space:nowrap; border-radius:6px; padding:8px 18px;">
+                        Go to Payments →
+                    </a>
+                </div>
+
                 <!--  add button area -->
                 <div class="d-flex flex-row align-items-center justify-content-between mb-4">
                     <div class="searchBar w-100 m-3">
@@ -185,7 +203,7 @@
                         <input type="text" class="searchInput" id="searchPayment" placeholder="Search Payments">
                     </div>
                     <button class="btn btn-gold" style="width: 200px;" data-bs-toggle="modal"
-                        data-bs-target="#addPurchaseOrderModal" onclick="loadCompletedPriceRequests()">Place Order</button>
+                        data-bs-target="#addPurchaseOrderModal" onclick="openAddPurchaseOrderModal()">Place Order</button>
                 </div>
 
                 <!-- purchase order table -->
@@ -228,29 +246,34 @@
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control w-75" id="companyname" name="companyname"
                                     placeholder="Enter company name">
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="contactperson" class="form-label">Contact Person: <span
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control w-75" id="contactperson" name="contactperson"
                                     placeholder="Enter contact person name">
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="email" class="form-label">Email: <span
                                         class="text-danger">*</span></label>
                                 <input type="email" class="form-control w-75" id="email" name="email" placeholder="Enter email">
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="contact" class="form-label">Phone Number: <span
                                         class="text-danger">*</span></label>
                                 <input type="tel" class="form-control w-75" id="contact" name="contact"
                                     placeholder="Enter phone number">
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="address" class="form-label">Address: <span
                                         class="text-danger">*</span></label>
                                 <textarea id="address" name="address" class="form-control w-75"
                                     placeholder="Enter address"></textarea>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="status" class="form-label">Status: <span
@@ -306,6 +329,7 @@
                                 <select class="form-select w-75" id="poPriceRequest" name="priceRequestId" onchange="onPriceRequestSelected(this.value)" required>
                                     <option value="" selected disabled>Select Price Request</option>
                                 </select>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="poSupplier" class="form-label">Supplier: <span
@@ -324,7 +348,7 @@
                                         class="text-danger">*</span></label>
                                 <select class="form-select w-75" id="poItem" name="items" required>
                                     <option value="" selected disabled>Select Item / Material</option>
-                                    <option th:each="mat : ${materialsList}" th:value="${mat.name}" th:text="${mat.name}"></option>
+                                    <option th:each="mat : ${materialsList}" th:value="${mat.material}" th:text="${mat.material}"></option>
                                 </select>
                             </div>
                             <div class="mb-3 w-50">
@@ -332,6 +356,7 @@
                                         class="text-danger">*</span></label>
                                 <input type="text" class="form-control w-75" id="poQuantity" name="quantity"
                                     placeholder="Enter quantity" required>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="poStatus" class="form-label">Payment Status: <span
@@ -404,6 +429,7 @@
                             <div class="mb-3 w-50">
                                 <label for="prQuantity" class="form-label">Quantity Required: <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control w-75" id="prQuantity" placeholder="e.g. 500 sheets, 10 L" required>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
 
                             <div class="mb-3 w-50">
@@ -470,7 +496,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg supModal">
             <div class="modal-content p-4 shadow-lg rounded-4">
                 <div class="modal-header d-inline-flex justify-content-between align-items-center p-3">
-                    <h4 class="modal-title text-white">Edit Payment Status</h4>
+                    <h4 class="modal-title text-white">Edit Payment Status <span id="paidBadge" class="badge bg-success ms-3" style="display:none;">PAID</span></h4>
                     <button type="button" class="btn btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -486,6 +512,10 @@
                         </div>
 
                         <div id="paymentDetailsSection" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Amount To Pay:</label>
+                                <div id="amountDueDisplay" class="fw-bold">-</div>
+                            </div>
                             <div class="mb-3">
                                 <label for="paymentMethod" class="form-label">Payment Method: <span class="text-danger">*</span></label>
                                 <select class="form-select" id="paymentMethod" name="paymentMethod">

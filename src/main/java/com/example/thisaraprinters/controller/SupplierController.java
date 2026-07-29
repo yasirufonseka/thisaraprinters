@@ -4,6 +4,7 @@ import com.example.thisaraprinters.dto.PriceRequestDto;
 import com.example.thisaraprinters.dto.PriceRequestReplyDto;
 import com.example.thisaraprinters.dto.SupplierDto;
 import com.example.thisaraprinters.model.PriceRequestReply;
+import com.example.thisaraprinters.model.PurchaseOrder;
 import com.example.thisaraprinters.model.Supplier;
 import com.example.thisaraprinters.repository.SupplierRepo;
 import com.example.thisaraprinters.service.SupplierService;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@RestController
 @RequestMapping("/supplier")
 @Controller
 public class SupplierController {
@@ -130,8 +130,17 @@ public class SupplierController {
         }
     }
 
+    @PostMapping("/purchaseorder/update/{id}")
+    public ResponseEntity<Map<String, String>> updatePurchaseOrder(@RequestBody com.example.thisaraprinters.dto.PurchaseOrderDto dto, @PathVariable("id") Integer id) {
+        try {
+            return ResponseEntity.status(200).body(Map.of("message", supplierService.updatePurchaseOrder(id, dto)));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @GetMapping("/purchaseorders")
-    public ResponseEntity<List<com.example.thisaraprinters.model.PurchaseOrder>> getAllPurchaseOrders() {
+    public ResponseEntity<List<PurchaseOrder>> getAllPurchaseOrders() {
         return ResponseEntity.status(200).body(supplierService.getAllPurchaseOrders());
     }
 
@@ -201,4 +210,3 @@ public class SupplierController {
 
     }
 }
-

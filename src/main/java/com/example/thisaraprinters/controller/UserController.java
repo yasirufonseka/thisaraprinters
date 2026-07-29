@@ -15,8 +15,9 @@ import java.util.Map;
 
 import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 
-@RestController
+@Controller
 @RequestMapping("/user")
 public class UserController {
 
@@ -48,7 +49,7 @@ public class UserController {
     }
 
     @PutMapping("/update/user/{id}")
-    public ResponseEntity<Map<String, String>> updateUser(@RequestBody UserDto user, @PathVariable Integer id) {
+    public ResponseEntity<Map<String, String>> updateUser(@RequestBody UserDto user, @PathVariable("id") Integer id) {
         System.out.println("request recived");
         return ResponseEntity.status(200).body(Map.of("message", userService.updateUser(user, id)));
     }

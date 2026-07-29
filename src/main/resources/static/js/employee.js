@@ -132,12 +132,7 @@ const setCallingName = () => {
 
 const refreshEmployeeData = () => {
 
-    $.ajax({
-        url: "/employees/get/alldata",
-        type: "GET",
-        dataType: "json",
-        async: false,
-    })
+    getHTTPService("/employees/get/alldata", "GET", "json")
         .done(function (data, jqXHR) {
 
             employee = data;
@@ -160,8 +155,27 @@ const refreshEmployeeData = () => {
 
 // load employee data when the page is ready
 $(document).ready(function () {
+    loadDesignations();
     refreshEmployeeData();
 });
+
+// load designations into the dropdown
+const loadDesignations = () => {
+    getHTTPService("/employees/get/designations", "GET", "json")
+        .done(function (data) {
+            const select = document.getElementById("jobposition");
+            if (!select) return;
+            // clear all except the first placeholder option
+            while (select.options.length > 1) select.remove(1);
+            data.forEach(d => {
+                const opt = new Option(d.designation, d.id);
+                select.add(opt);
+            });
+        })
+        .fail(function () {
+            console.error("Failed to load designations");
+        });
+};
 
 //add employee array data into the table after fetching from the server
 
@@ -175,7 +189,7 @@ const populateEmployeeTable = (data = employee) => {
             <td onclick="viewEmployee(${emp.id})">${emp.fullname}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.callingname}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.nic}</td>
-            <td onclick="viewEmployee(${emp.id})">${emp.designationid.designation}</td>
+            <td onclick="viewEmployee(${emp.id})">${emp.designationid ? emp.designationid.designation : 'N/A'}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.email}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.phonenumber}</td>
             <td class="d-flex flex-row">
@@ -224,7 +238,10 @@ const updateEmployee = (id) => {
     document.getElementById("emgpersonphonenumber").value = emp.emgpersonphonenumber || "";
     document.querySelector(`input[name="gender"][value="${emp.gender}"]`).checked = true;
     document.querySelector(`textarea[name='address']`).value = emp.address;
-    document.querySelector(`select[name="designationid"] option[value="${emp.designationid.id}"]`).selected = true;
+    if (emp.designationid && emp.designationid.id) {
+        const desigSelect = document.querySelector(`select[name="designationid"]`);
+        if (desigSelect) desigSelect.value = emp.designationid.id;
+    }
     // Store the employee data
     document.getElementById("employeeFormData").dataset.id = id;
     const imagePreview = document.getElementById('imagePreview');
@@ -462,12 +479,7 @@ const deleteEmployee = (id) => {
         confirmButtonText: "Yes, delete it!"
     }).then((result) => {
         if (result.isConfirmed) {
-            $.ajax({
-                url: `/employees/delete/${id}`,
-                type: "DELETE",
-                dataType: "json",
-                async: false,
-            })
+            getHTTPService(`/employees/delete/${id}`, "DELETE", "json")
                 .done(function (data, jqXHR) {
                     swal.fire({
                         title: "Deleted!",

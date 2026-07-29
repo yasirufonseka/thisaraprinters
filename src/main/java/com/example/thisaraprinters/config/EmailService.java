@@ -49,7 +49,7 @@ public class EmailService {
 
                 helper.setTo(toEmail);
                 helper.setSubject(subject);
-                helper.setText(htmlBody, true); // true දැම්මම තමයි HTML විදිහට render වෙන්නේ
+                helper.setText(htmlBody, true);
 
                 mailSender.send(messages);
                 System.out.println("Email sent successfully to: " + toEmail);

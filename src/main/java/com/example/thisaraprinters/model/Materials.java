@@ -12,32 +12,23 @@ import java.util.List;
 @Table(name = "materials")
 @Data
 public class Materials {
-    @Id
+       @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
+
     @Column(name = "material")
-    private String name;
+    private String material;
+
     @Column(name = "status")
     private String status;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
-    @JsonIgnore
-    private Category categoryid;
+    private Category category;
 
     @ToString.Exclude
     @JsonIgnore
-    @ManyToMany(mappedBy = "materials")
-    private List<Supplier> supplires = new ArrayList<>();
-
-    @ToString.Exclude
-    @JsonIgnore
-    @ManyToMany(mappedBy = "materialsList")
-    private List<QuotationModel> quotations = new ArrayList<>();
-
-    @ToString.Exclude
-    @JsonIgnore
-    @OneToMany(mappedBy = "material", fetch = FetchType.LAZY)
-    private List<MaterialVariant> variants = new ArrayList<>();
+    @OneToMany(mappedBy = "material", cascade = CascadeType.ALL)
+    private List<MaterialVariant> variants;
 
 }

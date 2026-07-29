@@ -3,19 +3,16 @@ package com.example.thisaraprinters.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Entity
 @Table(name="inventory")
 public class Inventory {
-    @Id
+     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
 
     @Column(name = "grnnumber")
@@ -27,8 +24,11 @@ public class Inventory {
     @Column(name = "batchno")
     private String batchNo;
 
-    @Column(name="receivedquantity")
-    private Integer receivedquantity;
+    @Column(name = "receivedquantity")
+    private Integer receivedQuantity;
+
+    @Column(name = "units")
+    private String units;
 
     @Column(name = "expirydate")
     private LocalDate expiryDate;
@@ -39,25 +39,19 @@ public class Inventory {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
-    @ToString.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "variant_id")
-    @JsonIgnore
     private MaterialVariant variant;
 
-    @JoinColumn(name = "supplier_id",referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    private Supplier suppliers;
+    @JoinColumn(name = "purchase_order_id")
+    private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "received_by_user_id")
-    @JsonIgnore
     private UserModel receivedByUser;
 
-    @ToString.Exclude
-    @OneToMany(mappedBy = "inventory", fetch = FetchType.LAZY)
-    private List<StockLot> stockLots = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "inventory")
+    private List<StockLots> stockLots;
 }
-
-

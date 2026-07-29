@@ -19,27 +19,6 @@ $(document).ready(function () {
     // Load privilege table
     loadPrivilegeTable();
 });
-function openTab(evt, tabName) {
-    // hide all content boxes
-    var i, tabContent, tabButtons;
-    tabContent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabContent.length; i++) {
-        tabContent[i].style.display = "none";
-    }
-
-    // remove active class from all buttons
-    tabButtons = document.getElementsByClassName("tab-btn");
-    for (i = 0; i < tabButtons.length; i++) {
-        tabButtons[i].className = tabButtons[i].className.replace(" active", "");
-    }
-
-    // show clicked content box and add active class to clicked button
-    document.getElementById(tabName).style.display = "block";
-    if (evt) {
-        evt.currentTarget.className += " active";
-    }
-}
-
 // Default open tab
 document.addEventListener("DOMContentLoaded", function () {
     var defaultBtn = document.querySelector(".tab-btn");
@@ -69,11 +48,92 @@ const getEmployeeList = () => {
     })
 }
 
+// ─── Helpers to show/hide inline error messages under form fields ─────────────
+function showFieldError(inputId, message) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.classList.add("input-error");
+    const errorDiv = input.parentElement.querySelector(".errorMessage");
+    if (errorDiv) errorDiv.textContent = message;
+}
+
+function clearFieldError(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.classList.remove("input-error");
+    const errorDiv = input.parentElement.querySelector(".errorMessage");
+    if (errorDiv) errorDiv.textContent = "";
+}
+
+// ─── Validate the user form — returns false and highlights bad fields ──────────
+function validateUserForm() {
+    let isValid = true;
+
+    const requiredFields = [
+        { id: "username", label: "Username" },
+        { id: "userPassword", label: "Password" },
+    ];
+
+    requiredFields.forEach(({ id, label }) => {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) {
+            showFieldError(id, `${label} is required`);
+            isValid = false;
+        } else {
+            clearFieldError(id);
+        }
+    });
+
+    // Employee and role are dropdowns, so check their value differently
+    const employeeEl = document.getElementById("userEmployee");
+    if (!employeeEl || !employeeEl.value) {
+        showFieldError("userEmployee", "Please select an employee");
+        isValid = false;
+    } else {
+        clearFieldError("userEmployee");
+    }
+
+    const roleEl = document.getElementById("userRole");
+    if (!roleEl || !roleEl.value) {
+        showFieldError("userRole", "Please select a role");
+        isValid = false;
+    } else {
+        clearFieldError("userRole");
+    }
+
+    return isValid;
+}
+
+// ─── Blur listeners so errors clear as soon as the user fixes them ────────────
+document.addEventListener("DOMContentLoaded", function () {
+    ["username", "userPassword"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("blur", () => {
+            if (!el.value.trim()) showFieldError(id, `${id === "username" ? "Username" : "Password"} is required`);
+            else clearFieldError(id);
+        });
+        el.addEventListener("input", () => clearFieldError(id));
+    });
+
+    ["userEmployee", "userRole"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("change", () => {
+            if (!el.value) showFieldError(id, id === "userEmployee" ? "Please select an employee" : "Please select a role");
+            else clearFieldError(id);
+        });
+    });
+});
+
 const submitUser = (evt) => {
     // Prevent the default form submission (page reload)
     evt.preventDefault();
     const userformdata = new FormData(userFormData);
     const convertUserFormData = Object.fromEntries(userformdata.entries());
+
+    // Stop here if anything required is missing
+    if (!validateUserForm()) return;
 
     // Convert employeeid to integer
     convertUserFormData.employeeid = parseInt(convertUserFormData.employeeid);
@@ -190,15 +250,19 @@ const updateUser = (userid) => {
     //get user data 
     getHTTPService(`/user/getuserbyid/${id}`, "GET", "json").then((response) => {
         user = response;
-        console.log("selected user: " + user.employeeid.callingname);
+        console.log("selected user: " + (user?.employeeid?.callingname || 'No Employee'));
         const empId = user?.employeeid?.id;
         const empLabel = user?.employeeid?.callingname;
 
         const select = document.querySelector(`select[name="employeeid"]`);
-        if (!select.querySelector(`option[value="${empId}"]`)) {
-            select.add(new Option(empLabel, empId, true, true));
+        if (empId && empLabel) {
+            if (!select.querySelector(`option[value="${empId}"]`)) {
+                select.add(new Option(empLabel, empId, true, true));
+            }
+            select.value = empId;
+        } else {
+            select.value = "";
         }
-        select.value = empId;
         
         // Set status with proper value handling
         const statusSelect = document.getElementById("userStatus");

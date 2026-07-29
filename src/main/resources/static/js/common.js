@@ -65,3 +65,17 @@ const postHTTPService = (url, type, dataType, data) =>{
             console.log("Request complete");
         });
 }
+
+// Global Tab switcher utility
+const openTab = (evt, tabId) => {
+    document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    const targetTab = document.getElementById(tabId);
+    if (targetTab) {
+        targetTab.style.display = 'block';
+    }
+    if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+    }
+};

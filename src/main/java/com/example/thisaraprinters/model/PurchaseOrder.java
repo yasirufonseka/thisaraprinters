@@ -15,11 +15,11 @@ public class PurchaseOrder {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "supplier_id")
+    @JoinColumn(name = "supplier_id", referencedColumnName = "id")
     private Supplier supplier;
 
     @ManyToOne
-    @JoinColumn(name = "price_request_id")
+    @JoinColumn(name = "price_request_id", referencedColumnName = "id")
     private PriceRequest priceRequest;
 
     @Column(name = "order_date")
@@ -31,21 +31,27 @@ public class PurchaseOrder {
     @Column(name = "quantity")
     private String quantity;
 
-    @Column(name = "payment_status")
-    private String paymentStatus;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "notes")
     private String notes;
 
-    @Column(name = "payment_method")
-    private String paymentMethod;
-
-    @Column(name = "paid_amount")
-    private Double paidAmount;
-
-    @Column(name = "payment_proof")
-    private String paymentProof; // Stores the file path or file name
-
     @Column(name = "created_date")
     private LocalDate createdDate;
+
+    @Transient
+    private String paymentStatus;
+
+    @Transient
+    private String paymentMethod;
+
+    @Transient
+    private Double paidAmount;
+
+    @Transient
+    private String paymentProof;
+
+    @Transient
+    private String paymentNotes;
 }

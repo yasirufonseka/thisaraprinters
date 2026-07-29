@@ -42,7 +42,7 @@ body {
 
 /* Navbar */
 .top-navbar {
-    background-color: #0D1B2A !important;
+    background-color: #1A1A1A !important;
 }
 
 h2 {
@@ -244,9 +244,9 @@ h2 {
 }
 
 .modal-header {
-    background-color: #0D1B2A;
+    background-color: #1A1A1A;
     color: #FFFFFF;
-    border-bottom: 1px solid #1B263B;
+    border-bottom: 1px solid #333;
     border-radius: 12px 12px 0 0;
 }
 

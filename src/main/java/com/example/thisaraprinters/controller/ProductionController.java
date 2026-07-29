@@ -5,6 +5,7 @@ import com.example.thisaraprinters.service.ProductionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
@@ -24,6 +25,13 @@ public class ProductionController {
     public ModelAndView getProductionView() {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("production");
+        return mav;
+    }
+
+    @GetMapping("/staff")
+    public ModelAndView getStaffView() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("staff");
         return mav;
     }
 
@@ -69,5 +77,39 @@ public class ProductionController {
     public ResponseEntity<Map<String, String>> deleteJobByOrderId(@PathVariable("orderId") String orderId) {
         productionService.deleteJobByOrderId(orderId);
         return ResponseEntity.ok(Map.of("message", "Production job deleted successfully"));
+    }
+
+    @PostMapping("/save")
+    @ResponseBody
+    public ResponseEntity<ProductionModel> saveJob(@RequestBody ProductionModel job) {
+        return ResponseEntity.ok(productionService.createJob(job));
+    }
+
+    @PostMapping("/upload-artwork/{orderId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> uploadArtwork(
+            @PathVariable("orderId") String orderId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            ProductionModel updated = productionService.uploadArtwork(orderId, file);
+            return ResponseEntity.ok(Map.of(
+                "message", "Artwork uploaded successfully",
+                "artworkPath", updated.getArtworkPath(),
+                "artworkOriginalName", updated.getArtworkOriginalName() != null ? updated.getArtworkOriginalName() : ""
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Upload failed: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/delete-artwork/{orderId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteArtwork(@PathVariable("orderId") String orderId) {
+        try {
+            productionService.deleteArtwork(orderId);
+            return ResponseEntity.ok(Map.of("message", "Artwork deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "Delete failed: " + e.getMessage()));
+        }
     }
 }

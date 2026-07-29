@@ -4,9 +4,15 @@ import com.example.thisaraprinters.model.ProductionModel;
 import com.example.thisaraprinters.repository.ProductionRepo;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductionService {
@@ -19,53 +25,10 @@ public class ProductionService {
 
     @PostConstruct
     public void seedMockData() {
-        if (productionRepo.count() == 0) {
-            ProductionModel j1 = new ProductionModel();
-            j1.setOrderId("ORD-1025");
-            j1.setCustomerName("Saman Kumara");
-            j1.setDescription("Business Cards (1000pcs)");
-            j1.setDeadline(LocalDate.of(2026, 2, 20));
-            j1.setPriority("Urgent");
-            j1.setStatus("New Orders");
-            productionRepo.save(j1);
-
-            ProductionModel j2 = new ProductionModel();
-            j2.setOrderId("ORD-1015");
-            j2.setCustomerName("Nimal Perera");
-            j2.setDescription("Wedding Invitations");
-            j2.setDeadline(LocalDate.of(2026, 2, 26));
-            j2.setPriority("Normal");
-            j2.setStatus("Printing");
-            productionRepo.save(j2);
-
-            ProductionModel j3 = new ProductionModel();
-            j3.setOrderId("ORD-1030");
-            j3.setCustomerName("Tech Solutions");
-            j3.setDescription("Annual Report");
-            j3.setDeadline(LocalDate.of(2026, 2, 22));
-            j3.setPriority("High");
-            j3.setStatus("Design Phase");
-            productionRepo.save(j3);
-
-            ProductionModel j4 = new ProductionModel();
-            j4.setOrderId("ORD-1010");
-            j4.setCustomerName("School Book Project");
-            j4.setDescription("Textbooks (Grade 5)");
-            j4.setDeadline(LocalDate.of(2026, 2, 28));
-            j4.setPriority("Normal");
-            j4.setStatus("Finishing");
-            productionRepo.save(j4);
-
-            ProductionModel j5 = new ProductionModel();
-            j5.setOrderId("ORD-1005");
-            j5.setCustomerName("Local Council");
-            j5.setDescription("Posters (A3)");
-            j5.setDeadline(LocalDate.of(2026, 2, 15));
-            j5.setPriority("Normal");
-            j5.setStatus("Ready to Deliver");
-            productionRepo.save(j5);
-
-            System.out.println("================= Production mock records seeded successfully =================");
+        // Delete previously seeded mock data
+        List<String> mockOrderIds = List.of("ORD-1025", "ORD-1015", "ORD-1030", "ORD-1010", "ORD-1005");
+        for (String orderId : mockOrderIds) {
+            productionRepo.findByOrderId(orderId).ifPresent(productionRepo::delete);
         }
     }
 
@@ -99,5 +62,56 @@ public class ProductionService {
     public void deleteJobByOrderId(String orderId) {
         ProductionModel job = getJobByOrderId(orderId);
         productionRepo.delete(job);
+    }
+
+    public ProductionModel createJob(ProductionModel job) {
+        return productionRepo.save(job);
+    }
+
+    // Upload artwork for a production job
+    public ProductionModel uploadArtwork(String orderId, MultipartFile file) throws IOException {
+        ProductionModel job = getJobByOrderId(orderId);
+
+        // Save to external uploads directory (served via WebMvcConfig resource handler)
+        String uploadDir = "uploads/artwork/";
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        // Delete old file if present
+        if (job.getArtworkPath() != null) {
+            Path oldFile = Paths.get(job.getArtworkPath());
+            if (Files.exists(oldFile)) {
+                Files.delete(oldFile);
+            }
+        }
+
+        String ext = "";
+        String origName = file.getOriginalFilename();
+        if (origName != null && origName.contains(".")) {
+            ext = origName.substring(origName.lastIndexOf("."));
+        }
+        String savedName = UUID.randomUUID().toString() + ext;
+        Path savePath = uploadPath.resolve(savedName);
+        Files.write(savePath, file.getBytes());
+
+        job.setArtworkPath(uploadDir + savedName); // store full relative path for file deletion
+        job.setArtworkOriginalName(origName);
+        return productionRepo.save(job);
+    }
+
+    // Delete artwork for a production job
+    public void deleteArtwork(String orderId) throws IOException {
+        ProductionModel job = getJobByOrderId(orderId);
+        if (job.getArtworkPath() != null) {
+            Path filePath = Paths.get(job.getArtworkPath());
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+            job.setArtworkPath(null);
+            job.setArtworkOriginalName(null);
+            productionRepo.save(job);
+        }
     }
 }

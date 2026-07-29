@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.example.thisaraprinters.model.DesignationModel;
@@ -31,18 +31,18 @@ public class DataInitializer implements CommandLineRunner {
     private final EmployeeRepo employeeRepo;
     private final DesignationRepo designationRepo;
     private final ModuleRepo moduleRepo;
-    private final PasswordEncoder passwordEncoder;
-
+   // private final PasswordEncoder passwordEncoder;
+//PasswordEncoder passwordEncoder
     public DataInitializer(UserRepo userRepo, RoleRepo roleRepo, PrivilegeRepo privilegeRepo, 
                            EmployeeRepo employeeRepo, DesignationRepo designationRepo, 
-                           ModuleRepo moduleRepo, PasswordEncoder passwordEncoder) {
+                           ModuleRepo moduleRepo ) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.privilegeRepo = privilegeRepo;
         this.employeeRepo = employeeRepo;
         this.designationRepo = designationRepo;
         this.moduleRepo = moduleRepo;
-        this.passwordEncoder = passwordEncoder;
+       // this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -97,23 +97,36 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Default admin privileges created.");
         }
 
-        // 3. Ensure a default Employee and User exist for admin login
+        // 3. Seed default designations (Manager, Designer, Operator)
+        String[] defaultDesignations = {"Manager", "Designer", "Operator"};
+        List<DesignationModel> existingDesignations = designationRepo.findAll();
+        java.util.Set<String> existingDesignationNames = new java.util.HashSet<>();
+        for (DesignationModel d : existingDesignations) {
+            existingDesignationNames.add(d.getDesignation());
+        }
+        for (String desigName : defaultDesignations) {
+            if (!existingDesignationNames.contains(desigName)) {
+                DesignationModel newDesig = new DesignationModel();
+                newDesig.setDesignation(desigName);
+                designationRepo.save(newDesig);
+                System.out.println("Default designation created: " + desigName);
+            }
+        }
+
+        // 4. Ensure a default Employee and User exist for admin login
         UserModel adminUser = userRepo.findByUsername("admin");
         if (adminUser == null) {
             // Need an employee first
             EmployeeModel adminEmployee;
             List<EmployeeModel> allEmployees = employeeRepo.findAll();
             if (allEmployees.isEmpty()) {
-                // Need a designation too if none exist
+                // Get Manager designation for admin employee
                 DesignationModel adminDesignation;
                 List<DesignationModel> allDesignations = designationRepo.findAll();
-                if (allDesignations.isEmpty()) {
-                    adminDesignation = new DesignationModel();
-                    adminDesignation.setDesignation("Manager");
-                    adminDesignation = designationRepo.save(adminDesignation);
-                } else {
-                    adminDesignation = allDesignations.get(0);
-                }
+                adminDesignation = allDesignations.stream()
+                    .filter(d -> "Manager".equals(d.getDesignation()))
+                    .findFirst()
+                    .orElse(allDesignations.get(0));
 
                 adminEmployee = new EmployeeModel();
                 adminEmployee.setFullname("System Administrator");
@@ -137,8 +150,8 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Admin user found. Resetting password and roles to ensure access.");
         }
 
-        adminUser.setPassword(passwordEncoder.encode("admin123"));
-        adminUser.setRole(adminRole);
-        userRepo.save(adminUser);
+//        adminUser.setPassword(passwordEncoder.encode("admin123"));
+//        adminUser.setRole(adminRole);
+       // userRepo.save(adminUser);
     }
 }

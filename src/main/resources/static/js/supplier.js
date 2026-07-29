@@ -1,8 +1,134 @@
 let isUpdate = false;
 let supplierid;
 let categories = [];
+let isPurchaseOrderUpdate = false;
+let currentPurchaseOrderId;
 
-//load functions on loading the web page
+// ─── Small helpers to show/hide error messages ────────────────────────────────
+// These make it easy to pop a message under any input without repeating yourself
+function showFieldError(inputId, message) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.classList.add("input-error");
+    // Look for the errorMessage div right after the input (or its parent wrapper)
+    const errorDiv = input.parentElement.querySelector(".errorMessage");
+    if (errorDiv) errorDiv.textContent = message;
+}
+
+function clearFieldError(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.classList.remove("input-error");
+    const errorDiv = input.parentElement.querySelector(".errorMessage");
+    if (errorDiv) errorDiv.textContent = "";
+}
+
+// Wire up blur listeners once the page is ready
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Supplier form fields
+    const supplierBlurFields = [
+        { id: "companyname", label: "Company name" },
+        { id: "contactperson", label: "Contact person name" },
+        { id: "contact", label: "Phone number" },
+        { id: "address", label: "Address" },
+    ];
+
+    supplierBlurFields.forEach(({ id, label }) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("blur", () => {
+            if (!el.value.trim()) {
+                showFieldError(id, `${label} is required`);
+            } else {
+                clearFieldError(id);
+            }
+        });
+        // Clear the error as soon as they start typing again
+        el.addEventListener("input", () => clearFieldError(id));
+    });
+
+    // check email pattern  
+    const emailEl = document.getElementById("email");
+    if (emailEl) {
+        emailEl.addEventListener("blur", () => {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailEl.value.trim()) {
+                showFieldError("email", "Email address is required");
+            } else if (!emailPattern.test(emailEl.value.trim())) {
+                showFieldError("email", "Please enter a valid email address");
+            } else {
+                clearFieldError("email");
+            }
+        });
+        emailEl.addEventListener("input", () => clearFieldError("email"));
+    }
+
+    // Purchase order quantity field
+    const poQtyEl = document.getElementById("poQuantity");
+    if (poQtyEl) {
+        poQtyEl.addEventListener("blur", () => {
+            if (!poQtyEl.value.trim()) {
+                showFieldError("poQuantity", "Quantity is required");
+            } else {
+                clearFieldError("poQuantity");
+            }
+        });
+        poQtyEl.addEventListener("input", () => clearFieldError("poQuantity"));
+    }
+
+    // Price request quantity field
+    const prQtyEl = document.getElementById("prQuantity");
+    if (prQtyEl) {
+        prQtyEl.addEventListener("blur", () => {
+            if (!prQtyEl.value.trim()) {
+                showFieldError("prQuantity", "Quantity is required");
+            } else {
+                clearFieldError("prQuantity");
+            }
+        });
+        prQtyEl.addEventListener("input", () => clearFieldError("prQuantity"));
+    }
+});
+
+// ─── Validate the supplier form before submitting ─────────────────────────────
+// Returns true if everything looks good, false if we found something missing
+function validateSupplierForm() {
+    let isValid = true;
+
+    const requiredFields = [
+        { id: "companyname", label: "Company name" },
+        { id: "contactperson", label: "Contact person" },
+        { id: "contact", label: "Phone number" },
+        { id: "address", label: "Address" },
+    ];
+
+    requiredFields.forEach(({ id, label }) => {
+        const el = document.getElementById(id);
+        if (!el || !el.value.trim()) {
+            showFieldError(id, `${label} is required`);
+            isValid = false;
+        } else {
+            clearFieldError(id);
+        }
+    });
+
+    // Check email separately so we can also validate the format
+    const emailEl = document.getElementById("email");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailEl || !emailEl.value.trim()) {
+        showFieldError("email", "Email address is required");
+        isValid = false;
+    } else if (!emailPattern.test(emailEl.value.trim())) {
+        showFieldError("email", "Please enter a valid email address");
+        isValid = false;
+    } else {
+        clearFieldError("email");
+    }
+
+    return isValid;
+}
+
 $(document).ready(function () {
     fetchMaterial();
 })
@@ -51,27 +177,6 @@ const renderCategoryOptions = () => {
         }
     });
 }
-
-//manage tab on the html page
-function openTab(evt, tabName) {
-    // hide all content boxes
-    var i, tabContent, tabButtons;
-    tabContent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabContent.length; i++) {
-        tabContent[i].style.display = "none";
-    }
-
-    // remove active class from all buttons
-    tabButtons = document.getElementsByClassName("tab-btn");
-    for (i = 0; i < tabButtons.length; i++) {
-        tabButtons[i].className = tabButtons[i].className.replace(" active", "");
-    }
-
-    // show clicked content box and add active class to clicked button
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
-}
-
 // Default open tab (optional, can also be handled by HTML style="display:block")
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelector(".tab-btn").click();
@@ -84,6 +189,9 @@ const submitSupplier = (evt) => {
     const formData = new FormData(supplierForm);
     const convertUserFormData = Object.fromEntries(formData.entries());
     const categories = formData.getAll("category");
+
+    // Run our validation first — stop if anything is missing or wrong
+    if (!validateSupplierForm()) return;
 
     if (categories.length > 0) {
         // Map the array of string IDs to an array of objects expected by the backend DTO
@@ -379,28 +487,117 @@ const onPriceRequestSelected = (priceRequestId) => {
     });
 };
 
+const openAddPurchaseOrderModal = () => {
+    isPurchaseOrderUpdate = false;
+    currentPurchaseOrderId = null;
+    document.querySelector('#addPurchaseOrderModal .modal-title').textContent = "Place Purchase Order";
+    document.querySelector('#purchaseOrderForm button[type="submit"]').textContent = "Place Order";
+    document.getElementById("purchaseOrderForm").reset();
+    loadCompletedPriceRequests();
+};
+
+const openEditPurchaseOrderModal = (orderId) => {
+    isPurchaseOrderUpdate = true;
+    currentPurchaseOrderId = orderId;
+    document.querySelector('#addPurchaseOrderModal .modal-title').textContent = "Edit Purchase Order";
+    document.querySelector('#purchaseOrderForm button[type="submit"]').textContent = "Update Order";
+    
+    const order = window.purchaseOrdersMap[orderId];
+    if (!order) return;
+
+    // Load price requests and suppliers
+    getHTTPService('/supplier/pricerequests/completed', 'GET', 'json').then((requests) => {
+        const prSelect = document.getElementById("poPriceRequest");
+        prSelect.innerHTML = '<option value="" disabled>Select Price Request</option>';
+        
+        let hasCurrentPr = false;
+         if (requests && requests.length > 0) {
+             requests.forEach(req => {
+                 const option = document.createElement("option");
+                 option.value = req.id;
+                 option.textContent = `PR-${req.id} - ${req.materialcategory} (${req.itemSpecification})`;
+                 prSelect.appendChild(option);
+                 if (order.priceRequest && req.id === order.priceRequest.id) {
+                     hasCurrentPr = true;
+                 }
+             });
+         }
+         
+         if (order.priceRequest && !hasCurrentPr) {
+             const option = document.createElement("option");
+             option.value = order.priceRequest.id;
+             option.textContent = `PR-${order.priceRequest.id} - ${order.priceRequest.materialcategory} (${order.priceRequest.itemSpecification})`;
+             prSelect.appendChild(option);
+         }
+         
+         if (order.priceRequest) {
+             prSelect.value = order.priceRequest.id;
+             getHTTPService(`/supplier/pricerequest/replies/${order.priceRequest.id}`, 'GET', 'json').then((replies) => {
+                 const supplierSelect = document.getElementById("poSupplier");
+                 supplierSelect.innerHTML = '<option value="" disabled>Select Supplier</option>';
+                 
+                 let hasCurrentSupplier = false;
+                 if (replies && replies.length > 0) {
+                     replies.forEach(reply => {
+                         const option = document.createElement("option");
+                         option.value = reply.supplier.id;
+                         option.textContent = `${reply.supplier.companyname} - Total: Rs. ${reply.totalAmount}`;
+                         supplierSelect.appendChild(option);
+                         if (order.supplier && reply.supplier.id === order.supplier.id) {
+                             hasCurrentSupplier = true;
+                         }
+                     });
+                 }
+                 
+                 if (order.supplier && !hasCurrentSupplier) {
+                     const option = document.createElement("option");
+                     option.value = order.supplier.id;
+                     option.textContent = order.supplier.companyname;
+                     supplierSelect.appendChild(option);
+                 }
+                 
+                 if (order.supplier) {
+                     supplierSelect.value = order.supplier.id;
+                 }
+             });
+         }
+    });
+
+    document.getElementById("poDate").value = order.orderDate || "";
+    document.getElementById("poItem").value = order.items || "";
+    document.getElementById("poQuantity").value = order.quantity || "";
+    document.getElementById("poStatus").value = order.paymentStatus || "Pending";
+    document.getElementById("poNote").value = order.notes || "";
+     
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById("addPurchaseOrderModal"));
+    modal.show();
+};
+
 const submitPurchaseOrder = (evt) => {
     evt.preventDefault();
     const form = evt.target;
     const formData = new FormData(form);
     const orderData = Object.fromEntries(formData.entries());
     
-    // Convert IDs and numbers to correct types
     orderData.priceRequestId = parseInt(orderData.priceRequestId);
     orderData.supplierId = parseInt(orderData.supplierId);
     
+    const url = isPurchaseOrderUpdate ? `/supplier/purchaseorder/update/${currentPurchaseOrderId}` : '/supplier/purchaseorder';
+    const actionText = isPurchaseOrderUpdate ? "Update Order" : "Place Order";
+    const confirmText = isPurchaseOrderUpdate ? "Are you sure you want to update this purchase order?" : "Are you sure you want to place this purchase order?";
+    const confirmBtn = isPurchaseOrderUpdate ? "Yes, update order" : "Yes, place order";
     
     swal.fire({
         icon: "question",
-        title: "Place Order",
-        text: "Are you sure you want to place this purchase order?",
+        title: actionText,
+        text: confirmText,
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, place order"
+        confirmButtonText: confirmBtn
     }).then((result) => {
         if (result.isConfirmed) {
-            postHTTPService('/supplier/purchaseorder', 'POST', 'json', orderData).then((response) => {
+            postHTTPService(url, 'POST', 'json', orderData).then((response) => {
                 swal.fire({
                     icon: "success",
                     title: "Success",
@@ -426,9 +623,11 @@ const loadPurchaseOrders = () => {
         if (!tableBody) return;
         
         tableBody.innerHTML = "";
-        
+        window.purchaseOrdersMap = {};
+
         if (orders && orders.length > 0) {
             orders.forEach(order => {
+                window.purchaseOrdersMap[order.id] = order;
                 const tr = document.createElement("tr");
                 const badgeClass = order.paymentStatus === 'Paid' ? 'bg-success' : 'bg-warning text-dark';
                 tr.innerHTML = `
@@ -438,7 +637,7 @@ const loadPurchaseOrders = () => {
                     <td>${order.items}</td>
                     <td><span class="badge ${badgeClass}">${order.paymentStatus}</span></td>
                     <td class="d-flex flex-row justify-content-center">
-                        <button class="btn btn-teal px-3 py-2 ms-2" onclick="openEditPaymentModal(${order.id}, '${order.paymentStatus}')">Edit</button>
+                        <button class="btn btn-teal px-3 py-2 ms-2" onclick="openEditPurchaseOrderModal(${order.id})">Edit</button>
                         <button class="btn btn-red px-3 py-2 ms-2" onclick="deletePurchaseOrder(${order.id})">Delete</button>
                     </td>
                 `;
@@ -496,10 +695,36 @@ const openEditPaymentModal = (orderId, currentStatus) => {
     document.getElementById("editPaymentStatus").value = currentStatus;
     document.getElementById("paymentProofFile").value = "";
     document.getElementById("paymentNotes").value = "";
-    
+
+    // Populate from cached orders map if available
+    if (window.purchaseOrdersMap && window.purchaseOrdersMap[orderId]) {
+        const order = window.purchaseOrdersMap[orderId];
+        // show latest paid amount if exists
+        const paidVal = order.paidAmount != null ? order.paidAmount : '';
+        document.getElementById("paidAmount").value = paidVal;
+
+        // compute amount due if totalAmount provided
+        const total = order.totalAmount != null ? parseFloat(order.totalAmount) : null;
+        const paid = order.paidAmount != null ? parseFloat(order.paidAmount) : 0.0;
+        const amountDueEl = document.getElementById("amountDueDisplay");
+        const paidBadge = document.getElementById("paidBadge");
+        if (total !== null) {
+            const due = Math.max(0, total - paid);
+            amountDueEl.textContent = 'Rs. ' + due.toFixed(2);
+            if (due <= 0) {
+                paidBadge.style.display = 'inline-block';
+            } else {
+                paidBadge.style.display = 'none';
+            }
+        } else {
+            amountDueEl.textContent = '-';
+            paidBadge.style.display = 'none';
+        }
+    }
+
     // Handle visibility of payment proof section
     handlePaymentStatusChange(currentStatus);
-    
+
     const modalEl = document.getElementById("editPaymentModal");
     const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     modal.show();
@@ -515,7 +740,8 @@ const handlePaymentStatusChange = (status) => {
     if (status === "Paid") {
         proofSection.style.display = "block";
         detailsSection.style.display = "block";
-        proofInput.required = true;
+        // Payment proof is optional now per request; only validate size if provided
+        proofInput.required = false;
         methodInput.required = true;
         amountInput.required = true;
     } else {
@@ -542,16 +768,6 @@ const submitPaymentUpdate = (evt) => {
     
     // Validate file size if paid and file is selected
     if (paymentStatus === "Paid") {
-        if (!paymentProofFile) {
-            swal.fire({
-                icon: "warning",
-                title: "Payment Proof Required",
-                text: "Please upload a payment proof file when marking as Paid.",
-                confirmButtonColor: "#3085d6"
-            });
-            return;
-        }
-        
         if (!paymentMethod || !paidAmount) {
              swal.fire({
                 icon: "warning",
@@ -561,16 +777,19 @@ const submitPaymentUpdate = (evt) => {
             });
             return;
         }
-        
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (paymentProofFile.size > maxSize) {
-            swal.fire({
-                icon: "error",
-                title: "File Too Large",
-                text: "Payment proof file must be less than 5MB.",
-                confirmButtonColor: "#d33"
-            });
-            return;
+
+        // If a file is provided, validate size
+        if (paymentProofFile) {
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (paymentProofFile.size > maxSize) {
+                swal.fire({
+                    icon: "error",
+                    title: "File Too Large",
+                    text: "Payment proof file must be less than 5MB.",
+                    confirmButtonColor: "#d33"
+                });
+                return;
+            }
         }
     }
     

@@ -1,52 +1,56 @@
 package com.example.thisaraprinters.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.ToString;
 
 @Entity
-@Table(name = "material_variants")
 @Data
+@Table(name = "material_variant")
 public class MaterialVariant {
-    @Id
+      @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "material_id", nullable = false)
+    @ToString.Exclude
     @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "material_id")
     private Materials material;
 
     @Column(name = "gsm")
     private Integer gsm;
 
-    @Column(name = "width_mm", precision = 8, scale = 2)
-    private BigDecimal widthMm;
+    @Column(name = "width_mm")
+    private Double width;
 
-    @Column(name = "height_mm", precision = 8, scale = 2)
-    private BigDecimal heightMm;
+    @Column(name = "height_mm")
+    private Double height;
 
     @Column(name = "sheets_per_ream")
     private Integer sheetsPerReam;
 
-    @Column(name = "weight_per_unit_kg", precision = 8, scale = 3)
-    private BigDecimal weightPerUnitKg;
+    @Column(name = "weight_per_unit")
+    private Double weightPerUnit;
 
-    @Column(name = "unit", nullable = false, length = 50)
+    @Column(name = "unit")
     private String unit;
 
-    @Column(name = "reorderlevel", nullable = false)
-    private Integer reorderlevel;
+    @Column(name = "reorder_level")
+    private Integer reorderLevel;
 
-    @Column(name = "status", nullable = false, length = 50)
+    @Column(name = "status")
     private String status;
 
-    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY)
-    private List<StockLot> stockLots = new ArrayList<>();
+    @Transient
+    private Double sheetRate;
 
-    @OneToMany(mappedBy = "variant", fetch = FetchType.LAZY)
-    private List<Inventory> inventories = new ArrayList<>();
+    @ToString.Exclude
+    @JsonIgnore
+    @OneToMany(mappedBy = "variant")
+    private List<StockLots> stockLots;
+
 }

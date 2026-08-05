@@ -29,7 +29,7 @@ function submitMaterial(event) {
        // availablequantity: parseInt(document.getElementById('materialQuantity').value),
         units: document.getElementById('materialUnit').value,
         reorderlevel: parseInt(document.getElementById('reorderlevel').value),
-        status: document.getElementById('materialStatus').value
+       // status: document.getElementById('materialStatus').value
     };
 
     const response = postHTTPService('/inventory/api/materials/add', 'POST', 'json', formData);
@@ -529,16 +529,28 @@ function populateCategory() {
 }
 
 const materialCategoryElement = document.getElementById("materialCategory");
+const materialCategory = document.getElementById("materialCategory");
+const height = document.getElementById("heightContainer");
+const width = document.getElementById("widthContainer");
+const weidth = document.getElementById("weidthContainer");
+const gsm = document.getElementById("materialGsmContainer");
+const sheetPerReam = document.getElementById("sheetPerReamContainer");
+const materialGsmInput = document.getElementById("materialgsm");
+const sheetPerReamInput = document.getElementById("sheetperream");
+const heightInput = document.getElementById("heightOfPaper");
+const widthInput = document.getElementById("widthOfPaper");
+const weightInput = document.getElementById("weight");
+
+//hide the div
+height.classList.add("d-none");
+width.classList.add("d-none");
+weidth.classList.add("d-none");
+gsm.classList.add("d-none");
+sheetPerReam.classList.add("d-none");
+
 if (materialCategoryElement) {
     materialCategoryElement.addEventListener("change", function (event) {
-        const materialCategory = document.getElementById("materialCategory");
-        const hight = document.getElementById("hightContainer");
-        const width = document.getElementById("widthContainer");
-        const weidth = document.getElementById("weidthContainer");
-    //hide the div
-    hight.classList.add("d-none");
-    width.classList.add("d-none");
-    weidth.classList.add("d-none");
+
 
     const selectedOption = materialCategory.options[materialCategory.selectedIndex].text;
     const autoUnit = getUnitForCategory(selectedOption);
@@ -547,21 +559,39 @@ if (materialCategoryElement) {
     }
 
     if(selectedOption === "Paper") {
-        hight.classList.add("d-inline");
+        height.classList.add("d-inline");
         width.classList.add("d-inline");
+        gsm.classList.add("d-inline");
+        sheetPerReam.classList.add("d-inline");
         weidth.classList.remove("d-inline");
-        
-        hight.classList.remove("d-none");
+
+        height.classList.remove("d-none");
         width.classList.remove("d-none");
+        gsm.classList.remove("d-none");
+        sheetPerReam.classList.remove("d-none");
         weidth.classList.add("d-none");
+        materialGsmInput.required = true;
+        sheetPerReamInput.required = true;
+        heightInput.required = true;
+        widthInput.required = true;
+        weightInput.required = false;
     } else {
-        hight.classList.remove("d-inline");
+        height.classList.remove("d-inline");
         width.classList.remove("d-inline");
+        gsm.classList.remove("d-inline");
+        sheetPerReam.classList.remove("d-inline");
         weidth.classList.add("d-inline");
         
-        hight.classList.add("d-none");
+        height.classList.add("d-none");
         width.classList.add("d-none");
+        gsm.classList.add("d-none");
+        sheetPerReam.classList.add("d-none");
         weidth.classList.remove("d-none");
+        materialGsmInput.required = false;
+        sheetPerReamInput.required = false;
+        heightInput.required = false;
+        widthInput.required = false;
+        weightInput.required = true;
     }
 
 });
@@ -569,14 +599,14 @@ if (materialCategoryElement) {
 
 function populateMaterial() {
     // populate material dropdown when category changes
-    const materialsName = document.getElementById("materialsName");
     const categorySelect = document.getElementById("materialCategory");
 
     if (categorySelect) {
         categorySelect.addEventListener("change", function () {
             // Capture selectedCategory HERE before entering any callback
             const selectedCategory = parseInt(this.value);
-            const addNewManterial = document.getElementById('addNewmaterial')
+            const addNewMaterialContainer = document.getElementById('addNewMaterial');
+            addNewMaterialContainer.innerHTML = '';
             getHTTPService("/inventory/get/materials", "GET", "json")
                 .done(function (response) {
                     const materialSelect = document.getElementById("materialName");
@@ -597,57 +627,60 @@ function populateMaterial() {
                             materialSelect.add(new Option(item.material, item.id));
                         });
                     materialSelect.add(new Option('Add new Material', 'custom'));
-                    
-                        materialSelect.addEventListener('change',function() {
-                            if(this.value === 'custom' || this.value === 'Add new Material') {
-                                //create new input field and label
-                                const newMaterialLabel = document.createElement('label');
-                                const newMaterialInput = document.createElement('input');
-                                //create label
-                                 newMaterialLabel.textContent = 'New Material Name';
-                                 newMaterialLabel.htmlFor = 'newMaterialName'
-                                 newMaterialLabel.classList.add('form-label','text-sm-left');
-
-                               //create input field
-
-                                newMaterialInput.type = 'text';
-                                newMaterialInput.classList.add('form-control');
-                                newMaterialInput.id = 'newMaterialName';
-                                // Clear previous content
-                                addNewMaterial.innerHTML = '';
-                                // add new input type as a child
-                                
-                                addNewMaterial.append(newMaterialLabel , newMaterialInput);
-                            }else{
-
-                                addNewMaterial.innerHTML = '';
-                            }
-                        
-
-                        });
                 })
                 .fail(function () {
                     console.error("Error loading materials");
                 });
         });
-
-           
     }
+}
+
+const materialNameSelect = document.getElementById("materialName");
+if (materialNameSelect) {
+    materialNameSelect.addEventListener('change', function() {
+        const addNewMaterialContainer = document.getElementById('addNewMaterial');
+        addNewMaterialContainer.innerHTML = '';
+
+        if (this.value === 'custom') {
+            const newMaterialLabel = document.createElement('label');
+            const newMaterialInput = document.createElement('input');
+
+            newMaterialLabel.textContent = 'New Material Name';
+            newMaterialLabel.htmlFor = 'newMaterialName';
+            newMaterialLabel.classList.add('form-label', 'text-sm-left');
+
+            newMaterialInput.type = 'text';
+            newMaterialInput.classList.add('form-control');
+            newMaterialInput.id = 'newMaterialName';
+            newMaterialInput.name = 'newMaterialName';
+            newMaterialInput.placeholder = 'Enter material name';
+            newMaterialInput.required = true;
+
+            addNewMaterialContainer.append(newMaterialLabel, newMaterialInput);
+        }
+    });
 }
 
 function addMaterial(event) {
     if (event) event.preventDefault();
-    const materialIdValue = document.getElementById("materialName").value;
+    const materialIdValue = document.getElementById("materialName");
+    const selectedCategoryId = parseInt(document.getElementById("materialCategory").value);
+    const addNewMaterial = document.getElementById("newMaterialName");
+    // Capture whether the user chose "custom" before overwriting the select value
+    const isNewMaterial = materialIdValue.value === "custom";
     const formData = {
-        materialName : { id: parseInt(materialIdValue) },
+        category : { id: selectedCategoryId },
+        materialName : isNewMaterial ? null : { id: parseInt(materialIdValue.value) },
+        newMaterialName : isNewMaterial ? addNewMaterial.value.trim() : null,
         materialgsm : parseInt(document.getElementById("materialgsm").value) || 0,
         sheetperream : parseInt(document.getElementById("sheetperream").value) || 0,
         reorderlevel : parseInt(document.getElementById("reorderlevel").value) || 0,
-        hightofpaper : parseFloat(document.getElementById("hightofpaper").value) || 0,
-        widthtofpaper : parseFloat(document.getElementById("widthtofpaper").value) || 0,
+        hightMm : parseFloat(document.getElementById("heightOfPaper").value) || 0,
+        widthtMm : parseFloat(document.getElementById("widthOfPaper").value) || 0,
         weight : parseFloat(document.getElementById("weight").value) || 0,
         unit : document.getElementById("materialUnit").value
     }
+    console.log(formData);
 
     postHTTPService("/inventory/save/material","POST","json",formData).then((responce) => {
         swal.fire({
@@ -656,12 +689,15 @@ function addMaterial(event) {
             text: responce.message || 'Material added successfully!',
             confirmButtonText: 'OK',
 
+        }).then(() => {
+            window.location.reload();
         })
     }).catch((error) => {
+        const message = error.responseJSON?.message || error.responseText || error.message || 'Error occurred while saving.';
         swal.fire({
             title: 'Error!',
             icon: 'error',
-            text: error.message || 'Error occurred while saving.',
+            text: message,
             confirmButtonText: 'OK',
         })
         console.log(error);
@@ -855,4 +891,3 @@ function submitReturnStock(event) {
         if (modal) modal.hide();
     }
 }
-

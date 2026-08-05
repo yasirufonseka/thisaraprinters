@@ -26,8 +26,12 @@ public class PrivilegeService {
     // All available modules in the system
     public static final List<String> ALL_MODULES = Arrays.asList(
         "Employee", "Supplier", "Inventory", "Production",
-        "Order", "Customer", "User", "Quotation"
+        "Order", "Customer", "User", "Quotation","Payment"
     );
+
+    public List<String> allModules (){
+       return moduleRepo.findAll().stream().map(m -> m.getName()).toList();
+    }
 
     public PrivilegeService(PrivilegeRepo privilegeRepo, RoleRepo roleRepo, ModuleRepo moduleRepo) {
         this.privilegeRepo = privilegeRepo;
@@ -40,7 +44,7 @@ public class PrivilegeService {
      */
     public List<String> getAllModules() {
         return ALL_MODULES;
-    }
+    }   
 
     /**
      * Get all privileges assigned to a specific role

@@ -56,9 +56,12 @@ public class InventoryController {
 
   @PostMapping("/save/material")
   public ResponseEntity<?> saveMaterial(@RequestBody AddNewMaterialDto material) {
-    String resualt = materialsService.saveMaterial(material);
-
-    return ResponseEntity.status(200).body(Map.of("message", resualt));
+    try {
+      String resualt = materialsService.saveMaterial(material);
+      return ResponseEntity.status(200).body(Map.of("message", resualt));
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+    }
   }
 
   @PostMapping("/api/grn/save-full")

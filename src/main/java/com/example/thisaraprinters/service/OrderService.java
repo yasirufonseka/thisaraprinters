@@ -168,6 +168,7 @@ public class OrderService {
         }
     }
 
+    @Transactional
     private double[] getProductDimensionsMm(String productSize) {
         if (productSize == null) {
             return new double[]{0.0, 0.0};
@@ -227,7 +228,7 @@ public class OrderService {
             return 0.0;
         }
 
-        // 1. Try checking PriceRequestReply
+        //  checking PriceRequestReply
         try {
             List<PriceRequestReply> replies = priceRequestReplyRepo.findAll();
             for (PriceRequestReply reply : replies) {
@@ -251,7 +252,7 @@ public class OrderService {
             // fallback
         }
 
-        // 2. Try checking PurchaseOrder
+        //  Try checking PurchaseOrder
         try {
             List<PurchaseOrder> orders = purchaseOrderRepo.findAll();
             for (PurchaseOrder order : orders) {
@@ -285,7 +286,7 @@ public class OrderService {
             // fallback
         }
 
-        // 3. Fallback: Dynamic formula based on GSM and dimensions
+        // Fallback: Dynamic formula based on GSM and dimensions
         double gsm = variant.getGsm() != null ? variant.getGsm() : 80.0;
         double width = variant.getWidth() != null ? variant.getWidth() : 297.0;
         double height = variant.getHeight() != null ? variant.getHeight() : 420.0;

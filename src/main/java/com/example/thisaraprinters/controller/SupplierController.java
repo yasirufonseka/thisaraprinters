@@ -113,6 +113,11 @@ public class SupplierController {
     public ResponseEntity<com.example.thisaraprinters.model.PriceRequest> getPriceRequestById(@PathVariable("id") int id) {
         return ResponseEntity.status(200).body(supplierService.getPriceRequestById(id));
     }
+
+    @GetMapping("/pricerequest/{id}/matching-suppliers")
+    public ResponseEntity<List<Supplier>> getMatchingSuppliersByPriceRequestCategory(@PathVariable("id") int id) {
+        return ResponseEntity.status(200).body(supplierService.getSuppliersByPriceRequestCategory(id));
+    }
     
     // Get completed price requests
     @GetMapping("/pricerequests/completed")

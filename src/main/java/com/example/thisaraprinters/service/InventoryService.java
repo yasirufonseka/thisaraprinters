@@ -44,22 +44,25 @@ public class InventoryService {
         this.materialVariantRepo = materialVariantRepo;
         this.purchaseOrderRepo = purchaseOrderRepo;
     }
-
+    //get save all GRNs
     public List<Inventory> getAllGRNs() {
         return inventoryRepository.findAll();
     }
-
+    //Get all the Stock
     public List<StockLots> getAllStockLots() {
         return stockLotsRepo.findAll();
     }
 
+    //save GRN
     @Transactional
     public void saveFullGrn(InventoryDto dto) {
-
-        // ── Issue 3 Fix: Validate all required inputs before touching the DB ──
+       // StockLots stockLots = stockLotsRepo.findById(dto.setPurchaseOrderId());
+        //  Validate all required inputs before touching the DB 
         validateGrnInput(dto);
 
         Inventory inventory = new Inventory();
+
+        int quantity = dto.getRecivedquantity() ;
 
         inventory.setSupplierInvoiceNo(dto.getSupplierInvoiceNo());
         inventory.setBatchNo(dto.getBatchNo());
@@ -71,7 +74,7 @@ public class InventoryService {
 
         // Set relationships
         if (dto.getVariant() != null && dto.getVariant().getId() != null) {
-            com.example.thisaraprinters.model.MaterialVariant variant = materialVariantRepo.findById(dto.getVariant().getId()).orElse(null);
+           MaterialVariant variant = materialVariantRepo.findById(dto.getVariant().getId()).orElse(null);
             inventory.setVariant(variant);
         }
         if (dto.getPurchaseOrderId() != null) {
@@ -248,7 +251,7 @@ public class InventoryService {
         stockLotsRepo.save(stockLot);
     }
 
-    // ── Delete StockLot and its linked Inventory record ──
+    //  Delete StockLot and its linked Inventory record
     @Transactional
     public void deleteByStockLotId(Integer stockLotId) {
         StockLots stockLot = stockLotsRepo.findById(stockLotId)
@@ -261,7 +264,7 @@ public class InventoryService {
         }
     }
 
-    // ── Save Returned Stock as a Stock Lot ──
+    //  Save Returned Stock as a Stock Lot
     @Transactional
     public void saveReturnStock(com.example.thisaraprinters.dto.ReturnStockDto dto) {
         if (dto.getVariantId() == null) {
@@ -291,6 +294,14 @@ public class InventoryService {
         stockLot.setCreatedAt(LocalDate.now());
 
         stockLotsRepo.save(stockLot);
+    }
+
+    @Transactional
+    public Materials addMaterials(){
+        Materials materials = new Materials();
+        materials.setMaterial("New Material");
+        materials.setStatus("Active");
+        return materialRepo.save(materials);
     }
 
 }

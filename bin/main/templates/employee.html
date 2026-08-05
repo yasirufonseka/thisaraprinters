@@ -107,30 +107,39 @@
                         <!-- GENERAL IDENTITY -->
                         <div class="w-100 mb-2">
                             <div class="d-flex align-items-center px-0 py-2 border-bottom">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#00AEEF" class="me-2"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
                                 <span class="section-title">GENERAL IDENTITY</span>
                             </div>
                         </div>
                         <div class="d-flex flex-row flex-wrap w-100">
+                            <div class="uploadArea mb-3 w-100 d-block">
+                                <label  class="form-label">Employee Photo </label>
+                                <div id="uploadArea" class="uploadArea  hover-zoom w-25 border border-2 border-dashed rounded-3 text-center p-4 d-flex flex-column align-items-center justify-content-center text-secondary bg-light cursor-pointer" style="cursor: pointer;">
+                                    <div id="uploadPrompt" class="d-flex align-items-center justify-content-center flex-column">
+                                        <i class="bi bi-image" style="font-size: 3rem;"></i> <p class="mt-2 mb-0 fw-semibold">Click here to upload user photo</p>
+                                        <small class="text-muted mt-2">Supports: JPG, PNG</small>
+                                    </div>
+                                    <input type="file" class="imageInput w-25 h-50 d-none" accept="image/*" name="image" id="imageInput" onchange="previewImage(this)">
+                                    <img id="imagePreview" src="" alt="" srcset="" class="d-none w-100 rounded-3">
+                                </div>
+                            </div>
                             <div class="mb-3 w-50">
-                                <label for="employeeFullName" class="form-label">Full Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control w-75" name="fullname" id="employeeFullName" placeholder="e.g. Sarah Jennifer Miller" onblur="setCallingName()" required>
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <label for="employeeFullName" class="form-label">Full Name</label>
+                                <input type="text" class="form-control w-75" name="fullname" id="employeeFullName" placeholder="e.g. Pasindu Silva" onblur="setCallingName()" required>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="employeeName" class="form-label">Calling Name</label>
-                                <input type="text" class="form-control w-75" name="callingname" id="employeeName" placeholder="e.g. Sarah Miller">
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <input type="text" class="form-control w-75" name="callingname" id="employeeName" placeholder="e.g. Pasindu">
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="employeeNIC" class="form-label">NIC / Passport <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control w-75" name="nic" id="employeeNIC" placeholder="e.g. 19924588214V" onkeyup="validateNIC()" required>
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <input type="text" class="form-control w-75" name="nic" id="employeeNIC" placeholder="e.g. 19924588214V/1234567890" onclick="setBirthDay()" onkeyup="validateNIC()" required>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="employeeDOB" class="form-label">Date of Birth <span class="text-danger">*</span></label>
                                 <input type="date" class="form-control w-75" name="dob" id="employeeDOB" required>
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label class="form-label">Gender <span class="text-danger">*</span></label>
@@ -144,24 +153,19 @@
                                         <label class="form-check-label" for="radioFemale">Female</label>
                                     </div>
                                 </div>
-                                <div class="errorMessage text-danger small mt-1"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="jobposition" class="form-label">Job Role <span class="text-danger">*</span></label>
                                 <select class="form-select w-75" name="designationid" id="jobposition" required>
-                                    <option value="" disabled selected>Estimator</option>
-                                    <option value="2">Manager</option>
-                                    <option value="3">Designer</option>
-                                    <option value="4">Operator</option>
+                                    <option value="" disabled selected>Select Job Role</option>
                                 </select>
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                         </div>
 
                         <!-- CONTACT INFORMATION -->
                         <div class="w-100 mb-2">
                             <div class="d-flex align-items-center px-0 py-2 border-bottom">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#00AEEF" class="me-2"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/></svg>
                                 <span class="section-title">CONTACT INFORMATION</span>
                             </div>
                         </div>
@@ -170,9 +174,9 @@
                                 <label for="employeeEmail" class="form-label">Work Email <span class="text-danger">*</span></label>
                                 <div class="input-group w-75">
                                     <span class="input-group-text bg-transparent text-muted"><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"/></svg></span>
-                                    <input type="email" class="form-control border-start-0" name="email" id="employeeEmail" placeholder="s.miller@presspro.erp" onkeyup="validateEmail()" required>
+                                    <input type="email" class="form-control border-start-0" name="email" id="employeeEmail" placeholder="supun@gmail.com" onkeyup="validateEmail()" required>
                                 </div>
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-50">
                                 <label for="employeePhone" class="form-label">Phone Number <span class="text-danger">*</span></label>
@@ -180,76 +184,40 @@
                                     <span class="input-group-text bg-transparent text-muted"><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M798-120q-125 0-247-54.5T329-329Q229-429 174.5-551T120-798q0-18 12-30t30-12h162q14 0 25 9.5t13 22.5l26 140q2 16-1 27t-11 19l-97 98q20 37 47.5 71.5T387-386q31 31 65 57.5t72 48.5l94-94q9-9 23.5-13.5T670-390l138 28q14 4 23 14.5t9 23.5v162q0 18-12 30t-30 12ZM241-600l66-66-17-94h-89q5 41 14 81t26 79Zm358 358q39 17 79.5 27t81.5 13v-88l-94-19-67 67ZM241-600Zm358 358Z"/></svg></span>
                                     <input type="tel" class="form-control border-start-0" name="phonenumber" id="employeePhone" placeholder="+94 77 012 3456" onkeyup="validateMobileNo()" required>
                                 </div>
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <div class="errorMessage text-danger" style="font-size: 0.8rem; margin-top: 4px;"></div>
                             </div>
                             <div class="mb-3 w-100">
                                 <label for="address" class="form-label">Residential Address</label>
-                                <textarea class="form-control" name="address" id="address" rows="3" placeholder="124 Industrial Way, Suite 400&#10;New City, ST 54321"></textarea>
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <textarea class="form-control" name="address" id="address" rows="3" placeholder="124 Gorakana, Keslewatte, Panadura"></textarea>
                             </div>
                         </div>
 
                         <!-- EMERGENCY CONTACT -->
                         <div class="w-100 mb-2">
                             <div class="d-flex align-items-center px-0 py-2 border-bottom">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#00AEEF" class="me-2"><path d="m480-160-26-80H280q-50 0-85-35t-35-85v-180q0-50 35-85t85-35h174l26-80h160l26 80h174q50 0 85 35t35 85v180q0 50-35 85t-85 35H666l-26 80H480ZM360-440h240v-80H360v80Z"/></svg>
                                 <span class="section-title">EMERGENCY CONTACT</span>
                             </div>
                         </div>
                         <div class="d-flex flex-row flex-wrap w-100">
                             <div class="mb-3 w-50">
-                                <label for="emergencyName" class="form-label">Contact Name</label>
-                                <input type="text" class="form-control w-75" name="emergencyName" id="emergencyName" placeholder="Full name of contact">
-                                <div class="errorMessage text-danger small mt-1"></div>
+                                <label for="emgpersonname" class="form-label">Contact Name</label>
+                                <input type="text" class="form-control w-75" name="emgpersonname" id="emgpersonname" placeholder="Full name of contact">
                             </div>
                             <div class="mb-3 w-50">
-                                <label for="emergencyPhone" class="form-label">Phone Number</label>
+                                <label for="emgpersonphonenumber" class="form-label">Phone Number</label>
                                 <div class="input-group w-75">
                                     <span class="input-group-text bg-transparent text-muted"><svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M798-120q-125 0-247-54.5T329-329Q229-429 174.5-551T120-798q0-18 12-30t30-12h162q14 0 25 9.5t13 22.5l26 140q2 16-1 27t-11 19l-97 98q20 37 47.5 71.5T387-386q31 31 65 57.5t72 48.5l94-94q9-9 23.5-13.5T670-390l138 28q14 4 23 14.5t9 23.5v162q0 18-12 30t-30 12ZM241-600l66-66-17-94h-89q5 41 14 81t26 79Zm358 358q39 17 79.5 27t81.5 13v-88l-94-19-67 67ZM241-600Zm358 358Z"/></svg></span>
-                                    <input type="tel" class="form-control border-start-0" name="emergencyPhone" id="emergencyPhone" placeholder="+94 00 000 0000">
+                                    <input type="tel" class="form-control border-start-0" name="emgpersonphonenumber" id="emgpersonphonenumber" placeholder="+94 00 000 0000" onkeyup="validateMobileNo()">
                                 </div>
-                                <div class="errorMessage text-danger small mt-1"></div>
                             </div>
                         </div>
 
-                        <!-- WORK ASSIGNMENT -->
-                        <div class="w-100 mb-2">
-                            <div class="d-flex align-items-center px-0 py-2 border-bottom">
-                                <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#00AEEF" class="me-2"><path d="M200-120q-33 0-56.5-23.5T120-200v-440q0-33 23.5-56.5T200-720h160v-40q0-33 23.5-56.5T440-840h80q33 0 56.5 23.5T600-760v40h160q33 0 56.5 23.5T840-640v440q0 33-23.5 56.5T760-120H200Zm0-80h560v-440H200v440Zm280-160q33 0 56.5-23.5T560-440q0-33-23.5-56.5T480-520q-33 0-56.5 23.5T400-440q0 33 23.5 56.5T480-360ZM360-720h240v-40H360v40ZM200-200v-440 440Z"/></svg>
-                                <span class="section-title">WORK ASSIGNMENT</span>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row flex-wrap w-100">
-                            <div class="mb-3 w-50">
-                                <label for="department" class="form-label">Department <span class="text-danger">*</span></label>
-                                <select class="form-select w-75" name="department" id="department">
-                                    <option value="Production">Production</option>
-                                    <option value="Sales">Sales</option>
-                                    <option value="HR">HR</option>
-                                </select>
-                                <div class="errorMessage text-danger small mt-1"></div>
-                            </div>
-                            <div class="mb-3 w-50">
-                                <label for="jobTitle" class="form-label">Job Title <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control w-75" name="jobTitle" id="jobTitle" placeholder="Estimator">
-                                <div class="errorMessage text-danger small mt-1"></div>
-                            </div>
-                            <div class="mb-3 w-50">
-                                <label for="branch" class="form-label">Branch / Location</label>
-                                <input type="text" class="form-control w-75" name="branch" id="branch" placeholder="Main Production Unit A">
-                                <div class="errorMessage text-danger small mt-1"></div>
-                            </div>
-                            <div class="mb-3 w-50">
-                                <label for="manager" class="form-label">Reporting Manager</label>
-                                <input type="text" class="form-control w-75" name="manager" id="manager" placeholder="James Thompson">
-                                <div class="errorMessage text-danger small mt-1"></div>
-                            </div>
-                        </div>
+                      
 
                         <!-- Form Action Buttons -->
                         <div class="mb-3 w-100 d-flex flex-row justify-content-end align-items-center gap-3">
                             <button type="submit" id="submitButton" class="btn submitButton btn-teal action-btn">Save Employee</button>
-                            <button type="reset" id="clearButton" class="btn btn-secondary action-btn" onclick="resetForm()">Reset</button>
+                            <button type="reset" class="btn btn-secondary action-btn" onclick="resetForm()">Reset</button>
                         </div>
                     </form>
                 </div>
@@ -265,6 +233,9 @@
 
     <!-- link js bootstrap -->
     <script th:src="@{/css/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js}"></script>
+
+    <!-- link common js file -->
+    <script th:src="@{/js/common.js}"></script>
 
     <!-- link employee js file -->
     <script th:src="@{/js/employee.js}"></script>

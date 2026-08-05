@@ -19,6 +19,25 @@ $(document).ready(function () {
     // Load privilege table
     loadPrivilegeTable();
 });
+
+const filterTableByText = (tableSelector, query) => {
+    document.querySelectorAll(`${tableSelector} tbody tr`).forEach((row) => {
+        if (row.cells.length === 1) return;
+        row.style.display = !query || row.textContent.toLowerCase().includes(query) ? "" : "none";
+    });
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const userSearch = document.getElementById("searchUser");
+    const privilegeSearch = document.getElementById("searchPrivilege");
+
+    userSearch?.addEventListener("input", () => {
+        filterTableByText(".userTable", userSearch.value.trim().toLowerCase());
+    });
+    privilegeSearch?.addEventListener("input", () => {
+        filterTableByText(".privilegeTable", privilegeSearch.value.trim().toLowerCase());
+    });
+});
 // Default open tab
 document.addEventListener("DOMContentLoaded", function () {
     var defaultBtn = document.querySelector(".tab-btn");
@@ -418,6 +437,7 @@ const loadPrivilegeTable = () => {
             `;
             tableBody.appendChild(tr);
         });
+        document.getElementById("searchPrivilege")?.dispatchEvent(new Event("input"));
     }).catch((error) => {
         console.error("Error loading privilege table:", error);
     });

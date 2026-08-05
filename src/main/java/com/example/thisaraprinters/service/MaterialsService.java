@@ -48,30 +48,23 @@ public class MaterialsService {
     // Add new material variant
     public String saveMaterial(AddNewMaterialDto material) {
 
-        if (material.getMaterialName() == null || material.getMaterialName().getId() == null) {
-            throw new IllegalArgumentException("MaterialName or ID is null");
-        }
-
-        Optional<Materials> materialOpt = materialRepo.findById(material.getMaterialName().getId());
-        if (materialOpt.isEmpty()) {
-            throw new IllegalArgumentException("Material not found");
-        }
+        Materials selectedMaterial = resolveMaterial(material);
 
         // Check if variant already exists
-        List<MaterialVariant> existingVariants = materialVariantRepo.findByMaterialId(material.getMaterialName().getId());
+        List<MaterialVariant> existingVariants = materialVariantRepo.findByMaterialId(selectedMaterial.getId());
         for (MaterialVariant existingVariant : existingVariants) {
             if (existingVariant.getGsm() != null && existingVariant.getGsm().equals(material.getMaterialgsm())
-                    && existingVariant.getHeight() != null && existingVariant.getHeight().equals(material.getHightofpaper())
-                    && existingVariant.getWidth() != null && existingVariant.getWidth().equals(material.getWidthtofpaper())) {
+                    && existingVariant.getHeight() != null && existingVariant.getHeight().equals(material.getHightMm())
+                    && existingVariant.getWidth() != null && existingVariant.getWidth().equals(material.getWidthtMm())) {
                 throw new DataIntegrityViolationException("Material variant already exists with same specifications");
             }
         }
 
         MaterialVariant saveMaterial = new MaterialVariant();
-        saveMaterial.setMaterial(materialOpt.get());
+        saveMaterial.setMaterial(selectedMaterial);
         saveMaterial.setGsm(material.getMaterialgsm());
-        saveMaterial.setHeight(material.getHightofpaper());
-        saveMaterial.setWidth(material.getWidthtofpaper());
+        saveMaterial.setHeight(material.getHightMm());
+        saveMaterial.setWidth(material.getWidthtMm());
         saveMaterial.setSheetsPerReam(material.getSheetperream());
         saveMaterial.setWeightPerUnit(material.getWeight());
         saveMaterial.setUnit(material.getUnit());
@@ -81,6 +74,39 @@ public class MaterialsService {
         materialVariantRepo.save(saveMaterial);
 
         return "Material variant added successfully";
+    }
+
+    private Materials resolveMaterial(AddNewMaterialDto material) {
+
+
+        if (material.getMaterialName() != null && material.getMaterialName().getId() != null) {
+            return materialRepo.findById(material.getMaterialName().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Material not found"));
+        }
+
+        String newMaterialName = material.getNewMaterialName() == null ? "" : material.getNewMaterialName().trim();
+        if (newMaterialName.isEmpty()) {
+            throw new IllegalArgumentException("Material name is required");
+        }
+
+        if (material.getCategory() == null || material.getCategory().getId() == null) {
+            throw new IllegalArgumentException("Material category is required");
+        }
+
+        Category category = categoryRepo.findById(material.getCategory().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Material category not found"));
+
+        Optional<Materials> existingMaterial =
+                materialRepo.findByMaterialIgnoreCaseAndCategoryId(newMaterialName, category.getId());
+        if (existingMaterial.isPresent()) {
+            return existingMaterial.get();
+        }
+
+        Materials createdMaterial = new Materials();
+        createdMaterial.setMaterial(newMaterialName);
+        createdMaterial.setCategory(category);
+        createdMaterial.setStatus("Active");
+        return materialRepo.save(createdMaterial);
     }
 
     // Update material

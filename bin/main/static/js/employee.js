@@ -132,12 +132,7 @@ const setCallingName = () => {
 
 const refreshEmployeeData = () => {
 
-    $.ajax({
-        url: "/employees/get/alldata",
-        type: "GET",
-        dataType: "json",
-        async: false,
-    })
+    getHTTPService("/employees/get/alldata", "GET", "json")
         .done(function (data, jqXHR) {
 
             employee = data;
@@ -160,8 +155,27 @@ const refreshEmployeeData = () => {
 
 // load employee data when the page is ready
 $(document).ready(function () {
+    loadDesignations();
     refreshEmployeeData();
 });
+
+// load designations into the dropdown
+const loadDesignations = () => {
+    getHTTPService("/employees/get/designations", "GET", "json")
+        .done(function (data) {
+            const select = document.getElementById("jobposition");
+            if (!select) return;
+            // clear all except the first placeholder option
+            while (select.options.length > 1) select.remove(1);
+            data.forEach(d => {
+                const opt = new Option(d.designation, d.id);
+                select.add(opt);
+            });
+        })
+        .fail(function () {
+            console.error("Failed to load designations");
+        });
+};
 
 //add employee array data into the table after fetching from the server
 
@@ -175,7 +189,7 @@ const populateEmployeeTable = (data = employee) => {
             <td onclick="viewEmployee(${emp.id})">${emp.fullname}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.callingname}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.nic}</td>
-            <td onclick="viewEmployee(${emp.id})">${emp.designationid.designation}</td>
+            <td onclick="viewEmployee(${emp.id})">${emp.designationid ? emp.designationid.designation : 'N/A'}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.email}</td>
             <td onclick="viewEmployee(${emp.id})">${emp.phonenumber}</td>
             <td class="d-flex flex-row">
@@ -220,11 +234,23 @@ const updateEmployee = (id) => {
     document.getElementById("employeeDOB").value = emp.dob;
     document.getElementById("employeeEmail").value = emp.email;
     document.getElementById("employeePhone").value = emp.phonenumber;
+    document.getElementById("emgpersonname").value = emp.emgpersonname || "";
+    document.getElementById("emgpersonphonenumber").value = emp.emgpersonphonenumber || "";
     document.querySelector(`input[name="gender"][value="${emp.gender}"]`).checked = true;
+    console.log(emp.gender);
     document.querySelector(`textarea[name='address']`).value = emp.address;
-    document.querySelector(`select[name="designationid"] option[value="${emp.designationid.id}"]`).selected = true;
+    if (emp.designationid && emp.designationid.id) {
+        const desigSelect = document.querySelector(`select[name="designationid"]`);
+        if (desigSelect) desigSelect.value = emp.designationid.id;
+    }
     // Store the employee data
     document.getElementById("employeeFormData").dataset.id = id;
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+
+    imagePreview.src = `data:image/jpeg;base64,${emp.image}`;
+    imagePreview.classList.remove('d-none');
+    uploadPrompt.classList.remove('d-none');
 }
 
 const validateEmptyFormData = () => {
@@ -241,16 +267,65 @@ const validateEmptyFormData = () => {
     return isValid;
 };
 
+document.getElementById("uploadArea").addEventListener("click",function () {
+    document.getElementById("imageInput").click();
+    
+});
+
+function previewImage(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const imagePreview = document.getElementById('imagePreview');
+            const uploadPrompt = document.getElementById('uploadPrompt');
+
+            imagePreview.src = e.target.result;
+            imagePreview.classList.remove('d-none');
+            uploadPrompt.classList.add('d-none');
+        }
+        reader.readAsDataURL(file);
+    }
+    
+}
+
+
 const employeeFormDataListener = (event) => {
     event.preventDefault();
+
+   const imageFile = document.getElementById("imageInput").files[0];
+  if(imageFile){
+    const imageSize = imageFile.size;
+    console.log("image size",imageSize);
+    const maxSize = 5;
+
+    if(imageSize/1024/1024 > maxSize){
+         swal.fire({
+                title: "Error",
+                text: `Image must be smaller than ${maxSize} MB.`,
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+            return;
+        }
+    } else {
+        console.log("No new image selected, keeping existing image.");
+    }
+
     if (!validateEmptyFormData()) {
         return;
     }
+   
     const formData = new FormData(employeeFormData);
-    const convertToJSON = Object.fromEntries(formData.entries());
-    console.log("Form data collected:", convertToJSON);
+    //const convertToJSON = Object.fromEntries(formData.entries());
+   // console.log("Form data collected:", convertToJSON);
     const employeeId = document.getElementById("employeeFormData").dataset.id;
 
+    if(imageFile){
+        // Do not append manually, FormData already includes it if the input is in the form
+        // formData.append("image",imageFile);
+    }
     // Store isUpdate before resetting it
     const shouldUpdate = isUpdate;
 
@@ -265,15 +340,14 @@ const employeeFormDataListener = (event) => {
     }
 
     const url = shouldUpdate ? `/employees/update/${employeeId}` : "/employees/add/employee";
-    const method = shouldUpdate ? "PUT" : "POST";
-
+    const method = "POST";
 
     $.ajax({
         url: url,
-        type: method,
-        data: JSON.stringify(convertToJSON),
-        contentType: "application/json",
-        dataType: "json",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData:false,
         async: false,
     })
         .done(function (data, jqXHR) {
@@ -296,7 +370,7 @@ const employeeFormDataListener = (event) => {
             console.error("Status code:", jqXHR.status);
             swal.fire({
                 title: "Error",
-                text: shouldUpdate ? "Failed to update employee. Please try again." : "Failed to add employee. Please try again.",
+                text: shouldUpdate ? "Failed to update employee. Please try again." : "Failed to add employee. Please try again." + jqXHR.responseText + textStatus + errorThrown,
                 icon: "error",
                 confirmButtonText: "OK"
             });
@@ -327,10 +401,19 @@ const resetForm = () => {
     if (document.activeElement) {
         document.activeElement.blur();
     }
+
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
+
+    imagePreview.src = "";
+    imagePreview.classList.add('d-none');
+    uploadPrompt.classList.remove('d-none');
+
     const form = document.getElementById("employeeFormData");
     if (form) form.reset();
     isUpdate = false;
     isView = false;
+    
     const submitBtn = document.getElementById("submitButton");
     const clearBtn = document.getElementById("clearButton");
     if (submitBtn) {
@@ -366,7 +449,7 @@ const viewEmployee = (id) => {
 
 
     //make inputs readonly
-    const inputs = document.querySelectorAll("#employeeFormData .form-control, #employeeFormData .form-select, #employeeFormData .form-check-input");
+    const inputs = document.querySelectorAll("#employeeFormData .form-control, #employeeFormData .form-select, #employeeFormData .form-check-input ");
     inputs.forEach(input => {
         if (input.type === 'radio' || input.tagName === 'SELECT') {
             input.disabled = true;
@@ -381,16 +464,24 @@ const viewEmployee = (id) => {
 
     //set employee data to the form
     const emp = employee.find(e => e.id === id);
+    console.log(emp.image);
     document.getElementById("employeeFullName").value = emp.fullname;
     document.getElementById("employeeName").value = emp.callingname;
     document.getElementById("employeeNIC").value = emp.nic;
     document.getElementById("employeeDOB").value = emp.dob;
     document.getElementById("employeeEmail").value = emp.email;
     document.getElementById("employeePhone").value = emp.phonenumber;
+    document.getElementById("emgpersonname").value = emp.emgpersonname || "";
+    document.getElementById("emgpersonphonenumber").value = emp.emgpersonphonenumber || "";
     document.querySelector(`input[name="gender"][value="${emp.gender}"]`).checked = true;
     document.querySelector(`textarea[name='address']`).value = emp.address;
     document.querySelector(`select[name="designationid"] option[value="${emp.designationid.id}"]`).selected = true;
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPrompt = document.getElementById('uploadPrompt');
 
+    imagePreview.src = `data:image/jpeg;base64,${emp.image}`;
+    imagePreview.classList.remove('d-none');
+    uploadPrompt.classList.add('d-none');
 }
 
 const deleteEmployee = (id) => {
@@ -404,12 +495,7 @@ const deleteEmployee = (id) => {
         confirmButtonText: "Yes, delete it!"
     }).then((result) => {
         if (result.isConfirmed) {
-            $.ajax({
-                url: `/employees/delete/${id}`,
-                type: "DELETE",
-                dataType: "json",
-                async: false,
-            })
+            getHTTPService(`/employees/delete/${id}`, "DELETE", "json")
                 .done(function (data, jqXHR) {
                     swal.fire({
                         title: "Deleted!",

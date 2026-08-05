@@ -16,7 +16,6 @@ public class MaterialVariant {
     private Integer id;
 
     @ToString.Exclude
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "material_id")
     private Materials material;

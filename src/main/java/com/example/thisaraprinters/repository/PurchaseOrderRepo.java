@@ -12,10 +12,11 @@ import java.util.List;
 @Repository
 public interface PurchaseOrderRepo extends JpaRepository<PurchaseOrder, Integer> {
     List<PurchaseOrder> findByOrderDateBetween(LocalDate start, LocalDate end);
+
     List<PurchaseOrder> findByCreatedDateBetween(LocalDate start, LocalDate end);
 
     @Query("SELECT o FROM PurchaseOrder o WHERE " +
-           "(o.orderDate IS NOT NULL AND o.orderDate BETWEEN :start AND :end) OR " +
-           "(o.orderDate IS NULL AND o.createdDate BETWEEN :start AND :end)")
+            "(o.orderDate IS NOT NULL AND o.orderDate BETWEEN :start AND :end) OR " +
+            "(o.orderDate IS NULL AND o.createdDate BETWEEN :start AND :end)")
     List<PurchaseOrder> findByDateRangeSmart(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }

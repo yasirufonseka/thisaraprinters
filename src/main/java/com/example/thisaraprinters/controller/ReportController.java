@@ -62,7 +62,7 @@ public class ReportController {
         }
     }
 
-    // ── 3. GRN Report ────────────────────────────────────
+    // GRN Report 
     @GetMapping("/grn")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> grnReport(
